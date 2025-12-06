@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #26D0FF;
+  --color-primary-hover: #1fb8e6;
+  --color-primary-flow: rgba(38, 208, 255, 0.08);
+  --color-primary-30: rgba(38, 208, 255, 0.3);
+  --color-dark: #242C47;
+  --color-light: #F2F2F2;
+  --color-white: #FFFFFF;
+
+  /* Gradients */
+  --color-gradient-start: #f8f9fa;
+  --color-gradient-end: #e8f4f8;
+  
+  --text-primary: #242C47;
+  --text-secondary: #9E9E9E;
+  
+  --color-success: #34D399;
+  --color-error: #FF5252;
+  --color-warning: #FFA726;
+
+  --font-family-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  .font-outfit {
+    font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  body {
+    font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    color: var(--text-primary);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.recharts-tooltip-wrapper {
+  display: none !important;
+}
+ 
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus {
+  outline: none !important;
+}
