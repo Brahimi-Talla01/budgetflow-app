@@ -7,18 +7,16 @@ import { useAuth } from "../../../application/context/AuthContext";
 
 const Hero = () => {
 
-    const { user } = useAuth();
+      const { user } = useAuth();
+      const navigate: NavigateFunction = useNavigate();
 
-    const navigate: NavigateFunction = useNavigate();
-
-
-    const handleStartClick = () => {
-        if (user) {
-            navigate('/dashboard');
-        } else {
-            navigate('/login');
-        }
-    };
+      const handleStartClick = () => {
+            if (user) {
+                  navigate('/dashboard');
+            } else {
+                  navigate('/login');
+            }
+      };
 
       return (
             <section className="relative overflow-hidden bg-white pt-16 pb-20 lg:pt-24 lg:pb-32">
@@ -48,9 +46,9 @@ const Hero = () => {
                                     </p>
 
                                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start mb-10">
-                                          <Button className="w-full sm:w-auto text-lg shadow-xl shadow-primary-flow transition-all duration-300 ">
+                                          <Button onClick={handleStartClick} className="w-full sm:w-auto text-lg shadow-xl shadow-primary-flow transition-all duration-300 ">
                                                 <span className="flex items-center gap-2">
-                                                      {user ? "Voir mon dashboard " : "Essayer Gratuitement"}
+                                                      {user ? "Voir votre dashboard " : "Essayer Gratuitement"}
                                                       <ArrowRight className="ml-2 w-5 h-5" />
                                                 </span>
                                           </Button>

@@ -4,15 +4,14 @@ import { Eye, EyeOff } from 'lucide-react';
 import { Checkbox } from '../ui/Checkbox'; 
 import { Button } from '../ui/Button'; 
 
-// Mise à jour: 'username' remplacé par 'email' pour correspondre au UserLoginSchema
 export type LoginFormDataType = {
-  email: string; // Doit être 'email' pour correspondre au backend
+  email: string; 
   password: string;
   rememberMe: boolean;
 };
 
 interface LoginFormProps {
-  onLogin: (data: Omit<LoginFormDataType, 'rememberMe'>) => void; // On envoie seulement email et password au backend
+  onLogin: (data: Omit<LoginFormDataType, 'rememberMe'>) => void; 
   onForgotPassword: () => void;
   isLoading: boolean;
 }
@@ -36,7 +35,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onForgotPassword, isLoad
   }, [errors]);
 
   const validateEmail = (email: string) => {
-    // Regex simple pour vérifier le format email
     return /\S+@\S+\.\S+/.test(email);
   };
 
@@ -53,8 +51,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onForgotPassword, isLoad
       newErrors.password = 'Le mot de passe est requis';
     }
 
-    // Le UserLoginSchema n'a pas de contrainte de longueur min/max
-    // Nous retirons la validation de longueur ici pour être plus souple, car c'est une connexion.
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -63,7 +59,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onForgotPassword, isLoad
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoading && validateForm()) {
-      // Envoyer uniquement l'email et le mot de passe, pas 'rememberMe'
       onLogin({ email: formData.email, password: formData.password });
     }
   };
@@ -71,7 +66,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onForgotPassword, isLoad
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
-        {/* Champ Email (anciennement Nom d'utilisateur) */}
+        {/* Champ Email  */}
         <Input
           label="Email"
           type="email"

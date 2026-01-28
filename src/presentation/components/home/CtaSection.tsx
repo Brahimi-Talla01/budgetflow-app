@@ -1,7 +1,21 @@
+import { useNavigate, type NavigateFunction } from 'react-router-dom';
+import { useAuth } from '../../../application/context/AuthContext';
 import { Button } from '../ui/Button';
 
 
 const CtaSection = () => {
+
+      const { user } = useAuth();
+      const navigate: NavigateFunction = useNavigate();
+
+      const handleStartClick = () => {
+            if (user) {
+                  navigate('/dashboard');
+            } else {
+                  navigate('/login');
+            }
+      };
+
       return (
             <div className='w-full pt-16 pb-20 lg:pt-24 lg:pb-32'>
 
@@ -14,8 +28,8 @@ const CtaSection = () => {
                         <p className='text-center text-sm sm:text-lg font-medium text-gray-500 pb-6'>Rejoignez des milliers d'utilisateurs qui gèrent déjà leur budget avec BudgetFlow</p>
 
                         <div className='flex items-center justify-center gap-6'>
-                              <Button variant='primary'>
-                                    Commencer gratuitement
+                              <Button onClick={handleStartClick} variant='primary'>
+                                    {user ? "Voir votre dashboard " : "Commencer gratuitement"}
                               </Button>
                               <Button variant='ghost' className='hover:text-dark'>
                                     Voir une démo

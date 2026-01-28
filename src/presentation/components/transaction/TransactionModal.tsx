@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { useFormValidation } from "../../../application/hooks/useFormValidation";
 import { AlertCircle, Briefcase, Calendar, DollarSign, FileText, Tag, TrendingDown, TrendingUp, X } from "lucide-react";
+import { useExpenses } from "../../../application/context/ExpenseContext";
+import { Button } from "../ui/Button";
 
 type TransactionType = 'expense' | 'income';
 
@@ -13,6 +15,8 @@ interface TransactionModalProps {
 const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, onSubmit }) => {
     
     const [transactionType, setTransactionType] = useState<TransactionType>('expense');
+    const {  loading } = useExpenses();
+    
 
     const { 
         formData, 
@@ -52,7 +56,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
 
             onSubmit(submitData, transactionType);
             
-            handleClose();
+            !loading && handleClose();
         }
     }, [formData, validateForm, transactionType, onSubmit, handleClose]);
 
@@ -77,7 +81,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
         <div className="fixed inset-0 z-50 flex items-center justify-center">
             {/* Overlay */}
             <div 
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                className="absolute inset-0 bg-black/10 backdrop-blur-sm"
                 onClick={handleClose}
             />
 
@@ -329,7 +333,8 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                             >
                                 Annuler
                             </button>
-                            <button
+                            <Button
+                                loading={loading}
                                 type="submit"
                                 className={`
                                     flex-1 px-6 py-3 rounded-xl font-semibold text-white transition-all 
@@ -338,7 +343,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                                 `}
                             >
                                 Ajouter {transactionType === 'expense' ? 'la dépense' : 'le revenu'}
-                            </button>
+                            </Button>
                         </div>
 
                     </div>

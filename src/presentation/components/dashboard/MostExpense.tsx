@@ -19,6 +19,8 @@ const MostExpense: React.FC<MostExpenseProps> = ({ expense }) => {
                   default: return <ListOrdered className={className} />;
             }
       };
+
+      const dateTransform = new Date(expense.date).toLocaleDateString("fr-FR");
       
       return (
             <div className="p-3 rounded-md flex items-center justify-between w-full border border-gray-100 hover:shadow-lg hover:scale-[1.02] transition-all cursor-pointer">
@@ -31,18 +33,18 @@ const MostExpense: React.FC<MostExpenseProps> = ({ expense }) => {
                               <div className="flex flex-col">
                                     <span className="text-sm font-semibold text-dark">{expense.category}</span>
                                     <span className="text-xs text-gray-400">
-                                          {expense.date.toLocaleDateString()}
+                                          {dateTransform}
                                     </span>
 
                               </div>
 
                         </div>
                         {expense.description && (
-                        <span className="text-xs text-gray-500 py-2">{expense.description}</span>
+                              <span className="text-xs text-gray-500 py-2">{expense.description}</span>
                         )}
                   </div>
 
-                  <span className="font-bold text-primary text-sm">{expense.amount} $</span>
+                  <span className="font-bold text-primary text-sm">{expense.amount} XAF</span>
             </div>
       );
 }

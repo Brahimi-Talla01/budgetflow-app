@@ -3,6 +3,8 @@ import { Check } from 'lucide-react';
 import { cn } from '../../../shared/utils/cn';
 import type { PricingPlan } from './Prices';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../../application/context/AuthContext';
+import { useNavigate, type NavigateFunction } from 'react-router-dom';
 
 
 interface PricingCardProps {
@@ -25,6 +27,17 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
 
       const variants = plan.isFeatured ? 'ghost' : 'primary';
       // const textBtn = plan.isFeatured ? 'Essayer gratuitement' : 'Commencer';
+
+      const { user } = useAuth();
+      const navigate: NavigateFunction = useNavigate();
+
+      const handleStartClick = () => {
+            if (user) {
+                  navigate('/dashboard');
+            } else {
+                  navigate('/login');
+            }
+      };
 
       return (
             <div className={cardClasses}>
@@ -54,6 +67,7 @@ const PricingCard: React.FC<PricingCardProps> = ({ plan }) => {
                   <Button 
                         className={`w-full ${variants === 'ghost' ? 'hover:text-dark' : ''}`}
                         variant={variants}
+                        onClick={handleStartClick}
                   >
                         {/* {textBtn} */}
                         {plan.buttonText}

@@ -1,14 +1,18 @@
-import { Activity, useState } from 'react';
+import { Activity } from 'react';
 import { Button } from '../ui/Button';
 import { Download, Plus } from 'lucide-react';
 import TransactionModal from '../transaction/TransactionModal';
+import type { ExpenseFormProps } from '../../../domain/entities/Expense';
+import type { TransactionType } from '../../pages/dashboard/DashboardPage';
 
-const Header = () => {
-      const [isModalOpen, setIsModalOpen] = useState(false);
+interface HeaderProps {
+      isModalOpen: boolean;
+      setIsModalOpen: (open: boolean) => void;
+      onSubmit: (data: ExpenseFormProps, type: TransactionType) => void;
+}
 
-      const handleSubmit = () => {
-            console.log("Submit data");
-      }
+
+const Header: React.FC<HeaderProps> = ({ isModalOpen, setIsModalOpen, onSubmit }) => {
 
       return (
             <>
@@ -40,15 +44,9 @@ const Header = () => {
                         <TransactionModal 
                               isOpen={isModalOpen} 
                               onClose={() => setIsModalOpen(false)}
-                              onSubmit={handleSubmit} 
+                              onSubmit={onSubmit} 
                         />
                   </Activity>
-                  {/* {isModalOpen && (
-                        <TransactionModal 
-                              isOpen={isModalOpen} 
-                              onClose={() => setIsModalOpen(false)} 
-                        />
-                  )} */}
             </>
       );
 };

@@ -5,15 +5,15 @@ export type ProjectId = number;
 
 // Interface des propriétés
 export interface ExpenseProps {
-      id: ExpenseId;          
+      id: number;
       amount: number;
       category: string;
-      description?: string;   
-      date: Date;             
+      description?: string;
+      date: Date;
       isActive: boolean;
       createdAt: Date;
-      userId: UserId;
-      projectId?: ProjectId;  
+      userId: number;
+      projectId?: number;
 }
 
 // Types pour la création 
@@ -35,6 +35,15 @@ export interface ExpenseFormProps {
     projectId?: number | null; 
     hasProject: boolean;      
 }
+
+export interface CreateExpenseDTO {
+    amount: number;
+    category: string;
+    description?: string;
+    date: string;             
+    projectId?: number;
+}
+
 
 // Classe Entité 
 export class Expense {

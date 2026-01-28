@@ -7,6 +7,10 @@ interface SelectOption {
       icon: React.ElementType; 
 }
 
+interface StyledSelectProps {
+  onChange: (value: string) => void;
+}
+
 const timeOptions: SelectOption[] = [
       { label: "7 derniers jours", value: "last_7_days", icon: Calendar },
       { label: "Ce mois-ci", value: "this_month", icon: DollarSign },
@@ -14,13 +18,14 @@ const timeOptions: SelectOption[] = [
       { label: "Cette année", value: "this_year", icon: Calendar },
 ];
 
-const StyledSelect = () => {
+const StyledSelect = ({ onChange }: StyledSelectProps) => {
       const [selectedOption, setSelectedOption] = useState<SelectOption>(timeOptions[2]);
       const [isOpen, setIsOpen] = useState(false);   
       const selectRef = useRef<HTMLDivElement>(null);
 
       const handleSelect = useCallback((option: SelectOption) => {
             setSelectedOption(option);
+            onChange(option.value);
             setIsOpen(false); 
       }, []);
 

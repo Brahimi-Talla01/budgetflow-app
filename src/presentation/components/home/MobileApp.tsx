@@ -1,5 +1,6 @@
 import { Smartphone, Star, Shield, Zap, Users } from 'lucide-react';
-import { assets } from '../../../assets/asset';
+// import { assets } from '../../../assets/asset';
+import AppPreview from './AppPreview';
 
 const MobileApp = () => {
 
@@ -107,31 +108,7 @@ const MobileApp = () => {
                         </div>
 
                         {/* Right Section */}
-                        <div className="relative lg:order-last order-first">
-                              
-
-                              <div className="relative mx-auto max-w-sm">
-
-                                    
-                                    {/* Phone Frame */}
-                                    <div className="relative z-10 bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
-                                          {/* Notch */}
-                                          <div className="absolute top-4 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-gray-900 z-20"></div>
-                                    
-                                          {/* Screen */}
-                                          <div className="bg-white rounded-[2.5rem] overflow-hidden aspect-9/19">                                             
-                                                <img 
-                                                      src={assets.budgetflow}
-                                                      alt="App Screenshot"
-                                                      className="w-full h-full object-cover"
-                                                /> 
-                                          </div>
-
-                                          {/* Home Indicator */}
-                                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-1/3 h-1 bg-white/30 rounded-full"></div>
-                                    </div>
-                              </div>
-                        </div>
+                        <AppPreview />
 
                         </div>
                   </div>

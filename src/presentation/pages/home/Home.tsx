@@ -9,22 +9,27 @@ import NavbarLanding from '../../components/home/NavbarLanding'
 import OurFigures from '../../components/home/OurFigures'
 import Prices from '../../components/home/Prices'
 import Testimonials from '../../components/home/Testimonial'
+import PageTitle from '../../components/ui/PageTitle'
 
 const Home = () => {
   return (
-    <div className='bg-light w-full min-h-full'>
-      <NavbarLanding />
-      <Hero />
-      <Feature />
-      <OurFigures />
-      <HowDoWork />
-      <Prices />
-      <Testimonials />
-      <FAQSection />
-      <MobileApp />
-      <CtaSection />
-      <Footer />
-    </div>
+    <>
+      <PageTitle title="Accueil" />
+    
+      <div className='bg-light w-full min-h-full'>
+        <NavbarLanding />
+        <Hero />
+        <Feature />
+        <OurFigures />
+        <HowDoWork />
+        <Prices />
+        <Testimonials />
+        <FAQSection />
+        <MobileApp />
+        <CtaSection />
+        <Footer />
+      </div>
+    </>
   )
 }
 

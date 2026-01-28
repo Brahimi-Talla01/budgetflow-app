@@ -4,82 +4,46 @@ import {
   ArrowLeft, 
   ArrowRight, 
   ShoppingBag, 
-  Coffee, 
   Car, 
   Home, 
-  Utensils,
-  Zap,
-  Wifi
+  ListOrdered,
+  ServerIcon
 } from 'lucide-react';
+import { useExpenses } from '../../../application/context/ExpenseContext';
 import RecentTransactionCard from './RecentTransactionCard';
 
-export type RecentTransType = {
-  icon: any;
-  title: string;
-  price: number;
-  date: string;
-  category: string;
-}
 
 const RecentTransaction = () => {
       const scrollContainerRef = useRef<HTMLDivElement>(null);
       const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
       const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
 
-      // Données de transactions
-      const recentTransactionData: RecentTransType[] = [
-            {
-                  icon: ShoppingBag,
-                  title: "Courses Supermarché",
-                  price: 125.50,
-                  date: "Aujourd'hui",
-                  category: "Alimentation"
-            },
-            {
-                  icon: Coffee,
-                  title: "Café Starbucks",
-                  price: 8.50,
-                  date: "Aujourd'hui",
-                  category: "Loisirs"
-            },
-            {
-                  icon: Car,
-                  title: "Essence Total",
-                  price: 65.00,
-                  date: "Hier",
-                  category: "Transport"
-            },
-            {
-                  icon: Home,
-                  title: "Loyer Appartement",
-                  price: 850.00,
-                  date: "Il y a 2 jours",
-                  category: "Logement"
-            },
-            {
-                  icon: Utensils,
-                  title: "Restaurant",
-                  price: 45.80,
-                  date: "Il y a 3 jours",
-                  category: "Alimentation"
-            },
-            {
-                  icon: Zap,
-                  title: "Facture Électricité",
-                  price: 89.00,
-                  date: "Il y a 5 jours",
-                  category: "Services"
-            },
-            {
-                  icon: Wifi,
-                  title: "Abonnement Internet",
-                  price: 39.99,
-                  date: "Il y a 7 jours",
-                  category: "Services"
-            }
-      ];
+      const { expenses, loading } = useExpenses();
 
-      // Vérifier si on peut scroller
+      if (loading) return <p>Chargement...</p>;
+
+      // Icon selon la catégorie
+      const getCategoryIcon = (category: string) => {
+            switch (category) {
+                  case "Alimentation": return ShoppingBag;
+                  case "Transport": return Car;
+                  case "Logement": return Home;
+                  case "Services": return ServerIcon;
+                  default: return ListOrdered;
+            }
+      };
+
+      // Parser les données API 
+      const parsedExpenses = expenses.map((exp) => ({
+            title: exp.description || exp.category,
+            price: exp.amount,
+            date: new Date(exp.date).toLocaleDateString("fr-FR"),
+            category: exp.category,
+            icon: getCategoryIcon(exp.category)
+      }));
+
+
+      // Scroll handlers
       const checkScroll = () => {
             if (scrollContainerRef.current) {
                   const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
@@ -88,29 +52,17 @@ const RecentTransaction = () => {
             }
       };
 
-      // Scroller vers la gauche
       const scrollLeft = () => {
-            if (scrollContainerRef.current) {
-                  scrollContainerRef.current.scrollBy({
-                        left: -320, 
-                        behavior: 'smooth'
-                  });
-            }
+            scrollContainerRef.current?.scrollBy({ left: -320, behavior: "smooth" });
       };
 
-      // Scroller vers la droite
       const scrollRight = () => {
-            if (scrollContainerRef.current) {
-                  scrollContainerRef.current.scrollBy({
-                        left: 320,
-                        behavior: 'smooth'
-                  });
-            }
+            scrollContainerRef.current?.scrollBy({ left: 320, behavior: "smooth" });
       };
 
-      // Obtenir la couleur de la catégorie
+      // Couleur de catégorie
       const getCategoryColor = (category: string) => {
-            switch(category) {
+            switch (category) {
                   case 'Alimentation': return 'bg-green-100 text-green-700';
                   case 'Transport': return 'bg-primary-30 text-primary';
                   case 'Logement': return 'bg-purple-100 text-purple-700';
@@ -129,10 +81,9 @@ const RecentTransaction = () => {
                               Transactions récentes
                         </h1>
 
-                        {/* Boutons */}
                         <div className='flex items-center gap-2'>
                               <Button 
-                                    variant='ghost' 
+                                    variant='ghost'
                                     size='sm'
                                     onClick={scrollLeft}
                                     disabled={!canScrollLeft}
@@ -140,8 +91,9 @@ const RecentTransaction = () => {
                               >
                                     <ArrowLeft className='w-5 h-5' />
                               </Button>
+
                               <Button 
-                                    variant='ghost' 
+                                    variant='ghost'
                                     size='sm'
                                     onClick={scrollRight}
                                     disabled={!canScrollRight}
@@ -152,26 +104,24 @@ const RecentTransaction = () => {
                         </div>
                   </div>
 
-                  {/* Conteneur  */}
+                  {/* Scroll container */}
                   <div 
                         ref={scrollContainerRef}
                         onScroll={checkScroll}
                         className='flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth cursor-pointer pb-2'
-                        style={{
-                        scrollbarWidth: 'none', 
-                        msOverflowStyle: 'none', 
-                  }}
+                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
-                        {recentTransactionData.map((transaction, index) => (
+                        {parsedExpenses.map((expense, index) => (
                               <RecentTransactionCard 
-                                    transaction={transaction} 
-                                    index={index} 
-                                    getCategoryColor={getCategoryColor}  
+                                    key={index}
+                                    expense={expense}
+                                    getCategoryColor={getCategoryColor}
                               />
                         ))}
                   </div>
             </div>
-      );
+      )
+
 };
 
 export default RecentTransaction;

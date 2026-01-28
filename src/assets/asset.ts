@@ -5,6 +5,7 @@ import testimonial2 from './test2.webp';
 import testimonial3 from './test3.jpeg';
 import faq from './faq.jpg';
 import budgetflow from './budgetflow.svg';
+import budgetflow_video from './budgetflow.mp4';
 import type { ExpenseProps } from '../domain/entities/Expense';
 
 export const assets = {
@@ -15,6 +16,7 @@ export const assets = {
       testimonial3,
       faq,
       budgetflow,
+      budgetflow_video,
 }
 
 

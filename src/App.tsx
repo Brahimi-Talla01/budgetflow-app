@@ -13,35 +13,43 @@ import RegisterPage from "./presentation/pages/auth/RegisterPage"
 import ForgetPasswordPage from "./presentation/pages/auth/ForgetPasswordPage"
 import PrivateRoute from "./routes/PrivateRoute"
 import { AuthProvider } from "./application/context/AuthContext"
+import { ExpenseProvider } from "./application/context/ExpenseContext"
+import { IncomeProvider } from "./application/context/IncomeContext"
 
 
 const App = () => {
   return (
     <AuthProvider>
-      <LoadingProvider>
-        <Routes>
+      <ExpenseProvider>
+        <IncomeProvider>
+          
+          <LoadingProvider>
+            <Routes>
 
-          {/* Routes  */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgetPasswordPage />} />
+              {/* Routes  */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgetPasswordPage />} />
 
-          {/* Routes */}
-          <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<Layout />}>
-              <Route index element={<DashboardPage />} /> 
-              <Route path="transaction" element={<TransactionPage />} /> 
-              <Route path="projet" element={<ProjectsPage />} />
-              <Route path="analyse" element={<AnalysePage />} /> 
-              <Route path="conseil" element={<ConseilPage />} /> 
-            </Route>
-          </Route>
+              {/* Routes */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/dashboard" element={<Layout />}>
+                  <Route index element={<DashboardPage />} /> 
+                  <Route path="transaction" element={<TransactionPage />} /> 
+                  <Route path="projet" element={<ProjectsPage />} />
+                  <Route path="analyse" element={<AnalysePage />} /> 
+                  <Route path="conseil" element={<ConseilPage />} /> 
+                </Route>
+              </Route>
 
-          <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} />
 
-        </Routes>
-      </LoadingProvider>
+            </Routes>
+          </LoadingProvider>
+
+        </IncomeProvider>
+      </ExpenseProvider>
     </AuthProvider>
   );
 }
