@@ -34,4 +34,7 @@ export const ENDPOINTS = {
             list: "/incomes/",
             byId: (incomeId: number) => `/incomes/${incomeId}`,
       },
+      projects: {
+            list: "/projects/",
+      },
 } as const;

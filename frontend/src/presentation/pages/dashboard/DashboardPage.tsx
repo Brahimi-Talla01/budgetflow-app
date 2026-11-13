@@ -4,31 +4,49 @@ import RecentTransaction from "../../components/dashboard/RecentTransaction"
 import TransactionsBar from "../../components/dashboard/TransactionsBar"
 import MostExpense from "../../components/dashboard/MostExpense"
 import EmptyStateMostExpense from "../../components/dashboard/EmptyStateMostExpense"
+import BalanceSummary from "../../components/dashboard/BalanceSummary"
 import { useExpenses } from "../../../application/context/expenseContext"
+import { useIncomes } from "../../../application/context/incomeContext"
 import { useState } from "react"
+import { AlertCircle, CheckCircle2, X } from "lucide-react"
 import type { TransactionPayload } from "../../../domain/entities/Expense"
 import PageTitle from "../../components/ui/PageTitle"
 
+interface Feedback {
+    kind: "success" | "error";
+    message: string;
+}
 
 const DashboardPage = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [feedback, setFeedback] = useState<Feedback | null>(null);
     const { expenses, loading, createExpense } = useExpenses();
+    const { createIncome } = useIncomes();
 
     const handleSubmit = async (data: TransactionPayload) => {
-        if (data.type !== "expense") return;
-
-        const ok = await createExpense({
+        const common = {
             amount: data.amount,
-            category: data.category,
             description: data.description,
             date: data.date,
             projectId: data.projectId,
-        });
+        };
 
-        if (!ok) {
-            alert("Erreur lors de la création de la dépense");
+        if (data.type === "expense") {
+            const created = await createExpense({ ...common, category: data.category });
+            setFeedback(
+                created
+                    ? { kind: "success", message: "Dépense ajoutée avec succès." }
+                    : { kind: "error", message: "Impossible d'ajouter la dépense." }
+            );
             return;
         }
+
+        const created = await createIncome({ ...common, source: data.category });
+        setFeedback(
+            created
+                ? { kind: "success", message: "Revenu ajouté avec succès." }
+                : { kind: "error", message: "Impossible d'ajouter le revenu." }
+        );
     };
 
     const haveNoExpense = expenses.length === 0;
@@ -37,7 +55,9 @@ const DashboardPage = () => {
     
     const isEmpty = topExpenses.length === 0;
 
-    if (loading) return (
+    // Ne pas remplacer tout le dashboard par un spinner lors d'une création :
+    // le message de retour doit rester visible.
+    if (loading && expenses.length === 0) return (
         <div className='flex justify-center items-center h-3/4'>
             <span className='w-11 h-11 my-1 rounded-full border-3 border-t-transparent border-primary animate-spin'></span>
         </div>
@@ -60,6 +80,29 @@ const DashboardPage = () => {
                     onSubmit={handleSubmit}
                 /> 
 
+                {feedback && (
+                    <div className={`mt-4 flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm ${
+                        feedback.kind === "success"
+                            ? "bg-green-50 border-green-200 text-green-700"
+                            : "bg-red-50 border-red-200 text-red-700"
+                    }`}>
+                        <div className="flex items-center gap-2">
+                            {feedback.kind === "success"
+                                ? <CheckCircle2 className="w-4 h-4 shrink-0" />
+                                : <AlertCircle className="w-4 h-4 shrink-0" />}
+                            <p className="font-medium">{feedback.message}</p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setFeedback(null)}
+                            aria-label="Fermer le message"
+                            className="cursor-pointer"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
+
                 <div className='w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
                     
                     <div className='
@@ -67,6 +110,7 @@ const DashboardPage = () => {
                         md:col-span-2 
                         xl:col-span-2 
                     '>
+                        <BalanceSummary />
                         <TransactionsBar />
 
                         {/* Recent transactions */}

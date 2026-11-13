@@ -15,6 +15,7 @@ import PrivateRoute from "./routes/PrivateRoute"
 import { AuthProvider } from "./application/context/AuthProvider"
 import { ExpenseProvider } from "./application/context/ExpenseProvider"
 import { IncomeProvider } from "./application/context/IncomeProvider"
+import { ProjectProvider } from "./application/context/ProjectProvider"
 
 
 const App = () => {
@@ -22,7 +23,8 @@ const App = () => {
     <AuthProvider>
       <ExpenseProvider>
         <IncomeProvider>
-          
+          <ProjectProvider>
+
           <LoadingProvider>
             <Routes>
 
@@ -48,6 +50,7 @@ const App = () => {
             </Routes>
           </LoadingProvider>
 
+          </ProjectProvider>
         </IncomeProvider>
       </ExpenseProvider>
     </AuthProvider>
