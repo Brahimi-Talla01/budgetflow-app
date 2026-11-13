@@ -6,3 +6,11 @@ export interface ProjectProps {
       createdAt: Date;
       userId: number;
 }
+
+export interface CreateProjectPayload {
+      name: string;
+      targetAmount: number;
+      color: string;
+}
+
+export type UpdateProjectPayload = Partial<CreateProjectPayload>;

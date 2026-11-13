@@ -8,12 +8,12 @@ import BalanceSummary from "../../components/dashboard/BalanceSummary"
 import { useExpenses } from "../../../application/context/expenseContext"
 import { useIncomes } from "../../../application/context/incomeContext"
 import { useState } from "react"
-import { AlertCircle, CheckCircle2, X } from "lucide-react"
+import AlertBanner, { type FeedbackKind } from "../../components/ui/AlertBanner"
 import type { TransactionPayload } from "../../../domain/entities/Expense"
 import PageTitle from "../../components/ui/PageTitle"
 
 interface Feedback {
-    kind: "success" | "error";
+    kind: FeedbackKind;
     message: string;
 }
 
@@ -81,26 +81,12 @@ const DashboardPage = () => {
                 /> 
 
                 {feedback && (
-                    <div className={`mt-4 flex items-start justify-between gap-3 rounded-lg border px-4 py-3 text-sm ${
-                        feedback.kind === "success"
-                            ? "bg-green-50 border-green-200 text-green-700"
-                            : "bg-red-50 border-red-200 text-red-700"
-                    }`}>
-                        <div className="flex items-center gap-2">
-                            {feedback.kind === "success"
-                                ? <CheckCircle2 className="w-4 h-4 shrink-0" />
-                                : <AlertCircle className="w-4 h-4 shrink-0" />}
-                            <p className="font-medium">{feedback.message}</p>
-                        </div>
-                        <button
-                            type="button"
-                            onClick={() => setFeedback(null)}
-                            aria-label="Fermer le message"
-                            className="cursor-pointer"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
+                    <AlertBanner
+                        kind={feedback.kind}
+                        message={feedback.message}
+                        onClose={() => setFeedback(null)}
+                        className="mt-4"
+                    />
                 )}
 
                 <div className='w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
