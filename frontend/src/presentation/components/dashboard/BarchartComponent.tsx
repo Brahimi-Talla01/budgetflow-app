@@ -1,150 +1,68 @@
-// import { useMemo } from "react";
-// import { AreaChart, Area, XAxis, ResponsiveContainer, Tooltip, CartesianGrid, YAxis } from "recharts";
-// import { useExpenses } from "../../../application/context/ExpenseContext";
-
-// interface Props {
-//   view: "Revenu" | "Dépense";
-//   period: string; 
-// }
-
-// export const BarchartComponent = ({ view, period }: Props) => {
-//       const { expenses } = useExpenses();
-
-//       //  Filtrer selon la période
-//       const filteredExpenses = useMemo(() => {
-//             const now = new Date();
-
-//             return expenses.filter(exp => {
-//                   const date = new Date(exp.createdAt);
-
-//                   if (period === "last_7_days") {
-//                         const diff = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
-//                         return diff <= 7;
-//                   }
-
-//                   if (period === "this_month") {
-//                         return (
-//                               date.getMonth() === now.getMonth() &&
-//                               date.getFullYear() === now.getFullYear()
-//                         );
-//                   }
-
-//                   if (period === "last_6_months") {
-//                         const months = (now.getFullYear() - date.getFullYear()) * 12 +
-//                                           (now.getMonth() - date.getMonth());
-//                         return months <= 6;
-//                   }
-
-//                   if (period === "this_year") {
-//                         return date.getFullYear() === now.getFullYear();
-//                   }
-
-//                   return true;
-//             });
-//       }, [expenses, period]);
-
-//       //  Mapper pour recharts 
-//       const graphData = useMemo(() => {
-//             return filteredExpenses.map(exp => ({
-//                   date: new Date(exp.createdAt).toLocaleDateString("fr-FR", { month: "short", day: "numeric" }),
-//                   value: exp.amount
-//             }))
-//             .reverse();
-//       }, [filteredExpenses]);
-      
-
-//       const CustomTooltip = ({ active, payload, label }: any) => {
-//             if (!active || !payload || !payload.length) return null;
-
-//             return (
-//                   <div className="bg-dark-10 text-light p-3 rounded-lg shadow-lg">
-//                         <p className="text-sm opacity-80">{label}</p>
-//                         <p className="font-semibold text-lg">
-//                         {payload[0].value.toLocaleString("fr-FR")} XAF
-//                         </p>
-//                   </div>
-//             );
-//       };
-
-
-//       const lastValue = graphData.length > 0 ? graphData[graphData.length - 1].value : 0;
-
-//       return (
-//             <div className="p-6 bg-white rounded-xl h-full">
-//                   <p className="mt-2 text-3xl font-bold text-dark">
-//                         {lastValue.toFixed(2)} XAF
-//                   </p>
-
-//                   <div className="w-full h-64 mt-8">
-//                         <ResponsiveContainer width="100%" height="100%">
-//                               <AreaChart
-//                                     data={graphData}
-//                               >
-//                                     <defs>
-//                                           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-//                                                 <stop offset="5%" stopColor="#26D0FF" stopOpacity={0.8}/>
-//                                                 <stop offset="95%" stopColor="#26D0FF" stopOpacity={0}/>
-//                                           </linearGradient>
-//                                     </defs>
-
-//                                     <CartesianGrid strokeDasharray="3 3" />
-
-//                                     <XAxis 
-//                                           dataKey="date" 
-//                                           axisLine={false} 
-//                                           tickLine={false}
-//                                     />
-
-//                                     <YAxis 
-//                                           axisLine={false}
-//                                           tickLine={false}
-//                                           tick={{ fill: "#9CA3AF", fontSize: 12 }}
-//                                     />
-
-//                                     <Tooltip 
-//                                           content={<CustomTooltip />} 
-//                                           cursor={{ stroke: "#26D0FF", strokeWidth: 1 }}
-//                                     />
-
-
-//                                     <Area
-//                                           type="monotone"
-//                                           dataKey="value"
-//                                           stroke="#26D0FF"
-//                                           strokeWidth={2}
-//                                           fill="url(#colorValue)"
-//                                           dot={false}
-//                                     />
-//                               </AreaChart>
-//                         </ResponsiveContainer>
-//                   </div>
-//             </div>
-//       );
-// };
-
-// export default BarchartComponent;
-
-
 import { useMemo, useState } from "react";
 import { AreaChart, Area, XAxis, ResponsiveContainer, Tooltip, CartesianGrid, YAxis } from "recharts";
-import { useExpenses } from "../../../application/context/ExpenseContext";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useExpenses } from "../../../application/context/expenseContext";
+import { useIncomes } from "../../../application/context/incomeContext";
 
 interface Props {
-  view: "Revenu" | "Dépense";
-  period: string; 
+      view: "Revenu" | "Dépense";
+      period: string;
 }
+
+interface ChartPoint {
+      date: string;
+      fullDate: string;
+      value: number;
+}
+
+interface ChartSource {
+      amount: number;
+      createdAt: Date;
+}
+
+interface ChartTooltipProps {
+      active?: boolean;
+      payload?: ReadonlyArray<{ payload?: ChartPoint }>;
+}
+
+const PERIOD_LABELS: Record<string, string> = {
+      last_7_days: "7 derniers jours",
+      this_month: "Ce mois",
+      last_6_months: "6 derniers mois",
+      this_year: "Cette année",
+};
+
+const ChartTooltip = ({ active, payload }: ChartTooltipProps) => {
+      const point = payload?.[0]?.payload;
+      if (!active || !point) return null;
+
+      return (
+            <div className="bg-white border border-gray-200 text-dark p-4 rounded-xl shadow-2xl min-w-[200px]">
+                  <p className="text-sm text-gray-600 mb-2">{point.fullDate}</p>
+                  <p className="font-bold text-2xl text-gray-900">
+                        {point.value.toLocaleString("fr-FR")} XAF
+                  </p>
+            </div>
+      );
+};
 
 export const BarchartComponent = ({ view, period }: Props) => {
       const { expenses } = useExpenses();
-      const [hoveredData, setHoveredData] = useState<any>(null);
+      const { incomes } = useIncomes();
+      const [hoveredData, setHoveredData] = useState<ChartPoint | null>(null);
+
+      // La vue "Revenu" doit afficher les revenus, pas les dépenses.
+      const items = useMemo<ChartSource[]>(
+            () => (view === "Revenu" ? incomes : expenses),
+            [view, incomes, expenses]
+      );
 
       // Filtrer selon la période
-      const filteredExpenses = useMemo(() => {
+      const filteredItems = useMemo(() => {
             const now = new Date();
 
-            return expenses.filter(exp => {
-                  const date = new Date(exp.createdAt);
+            return items.filter((item) => {
+                  const date = new Date(item.createdAt);
 
                   if (period === "last_7_days") {
                         const diff = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
@@ -170,28 +88,27 @@ export const BarchartComponent = ({ view, period }: Props) => {
 
                   return true;
             });
-      }, [expenses, period]);
+      }, [items, period]);
 
-      // Mapper pour recharts 
+      // Mapper pour recharts
       const graphData = useMemo(() => {
-            return filteredExpenses.map(exp => ({
-                  date: new Date(exp.createdAt).toLocaleDateString("fr-FR", { month: "short", day: "numeric" }),
-                  fullDate: new Date(exp.createdAt).toLocaleDateString("fr-FR", { 
-                        month: "short", 
-                        year: "numeric" 
+            return filteredItems.map((item) => ({
+                  date: new Date(item.createdAt).toLocaleDateString("fr-FR", { month: "short", day: "numeric" }),
+                  fullDate: new Date(item.createdAt).toLocaleDateString("fr-FR", {
+                        month: "short",
+                        year: "numeric"
                   }),
-                  value: exp.amount
-            }))
-            .reverse();
-      }, [filteredExpenses]);
+                  value: item.amount
+            })).reverse();
+      }, [filteredItems]);
 
       // Calculs statistiques
       const stats = useMemo(() => {
             const total = graphData.reduce((sum, item) => sum + item.value, 0);
             const firstValue = graphData.length > 0 ? graphData[0].value : 0;
             const lastValue = graphData.length > 0 ? graphData[graphData.length - 1].value : 0;
-            const growth = firstValue > 0 
-                  ? ((lastValue - firstValue) / firstValue) * 100 
+            const growth = firstValue > 0
+                  ? ((lastValue - firstValue) / firstValue) * 100
                   : 0;
 
             return {
@@ -202,26 +119,15 @@ export const BarchartComponent = ({ view, period }: Props) => {
             };
       }, [graphData]);
 
-      // Tooltip personnalisé
-      const CustomTooltip = ({ active, payload, label }: any) => {
-            if (!active || !payload || !payload.length) return null;
-
-            const data = payload[0].payload;
-            
-            return (
-                  <div className="bg-white border border-gray-200 text-dark p-4 rounded-xl shadow-2xl min-w-[200px]">
-                        <p className="text-sm text-gray-600 mb-2">{data.fullDate}</p>
-                        <p className="font-bold text-2xl text-gray-900">
-                              {payload[0].value.toLocaleString("fr-FR")} XAF
-                        </p>
-                  </div>
-            );
-      };
-
       // Handler pour le hover
-      const handleMouseMove = (data: any) => {
-            if (data && data.activePayload) {
-                  setHoveredData(data.activePayload[0].payload);
+      const handleMouseMove = (state: unknown) => {
+            if (typeof state !== "object" || state === null) return;
+
+            const activePayload = (state as { activePayload?: Array<{ payload?: ChartPoint }> }).activePayload;
+            const point = activePayload?.[0]?.payload;
+
+            if (point) {
+                  setHoveredData(point);
             }
       };
 
@@ -230,7 +136,6 @@ export const BarchartComponent = ({ view, period }: Props) => {
       };
 
       const displayValue = hoveredData ? hoveredData.value : stats.lastValue;
-      const displayDate = hoveredData ? hoveredData.fullDate : "Dernière valeur";
 
       return (
             <div className="bg-white rounded-xl h-full relative">
@@ -238,10 +143,9 @@ export const BarchartComponent = ({ view, period }: Props) => {
                   <div className="flex items-start justify-between mb-6">
                         <div>
                               <p className="text-sm text-gray-500 mb-2">
-                                    {hoveredData ? hoveredData.fullDate : period === "last_7_days" ? "7 derniers jours" : 
-                                    period === "this_month" ? "Ce mois" : 
-                                    period === "last_6_months" ? "6 derniers mois" : 
-                                    "Cette année"}
+                                    {hoveredData
+                                          ? hoveredData.fullDate
+                                          : `${view} · ${PERIOD_LABELS[period] ?? "Cette année"}`}
                               </p>
                               <p className="text-4xl font-bold text-gray-900">
                                     {displayValue.toLocaleString("fr-FR")} XAF
@@ -250,8 +154,8 @@ export const BarchartComponent = ({ view, period }: Props) => {
 
                         {/* Badge de croissance */}
                         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${
-                              stats.growth >= 0 
-                                    ? 'bg-green-100 text-green-700' 
+                              stats.growth >= 0
+                                    ? 'bg-green-100 text-green-700'
                                     : 'bg-red-100 text-red-700'
                         }`}>
                               {stats.growth >= 0 ? (
@@ -296,32 +200,32 @@ export const BarchartComponent = ({ view, period }: Props) => {
                                           </linearGradient>
                                     </defs>
 
-                                    <CartesianGrid 
-                                          strokeDasharray="3 3" 
+                                    <CartesianGrid
+                                          strokeDasharray="3 3"
                                           stroke="#E5E7EB"
                                           vertical={false}
                                     />
 
-                                    <XAxis 
-                                          dataKey="date" 
-                                          axisLine={false} 
+                                    <XAxis
+                                          dataKey="date"
+                                          axisLine={false}
                                           tickLine={false}
                                           tick={{ fill: "#9CA3AF", fontSize: 12 }}
                                           dy={10}
                                     />
 
-                                    <YAxis 
+                                    <YAxis
                                           axisLine={false}
                                           tickLine={false}
                                           tick={{ fill: "#9CA3AF", fontSize: 12 }}
-                                          tickFormatter={(value) => {
+                                          tickFormatter={(value: number) => {
                                                 if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
-                                                return value;
+                                                return String(value);
                                           }}
                                     />
 
-                                    <Tooltip 
-                                          content={<CustomTooltip />} 
+                                    <Tooltip
+                                          content={<ChartTooltip />}
                                           cursor={{ stroke: "#26D0FF", strokeWidth: 2, strokeDasharray: "5 5" }}
                                     />
 
@@ -332,11 +236,11 @@ export const BarchartComponent = ({ view, period }: Props) => {
                                           strokeWidth={3}
                                           fill="url(#colorValue)"
                                           dot={false}
-                                          activeDot={{ 
-                                                r: 6, 
-                                                fill: "#26D0FF", 
-                                                stroke: "#fff", 
-                                                strokeWidth: 3 
+                                          activeDot={{
+                                                r: 6,
+                                                fill: "#26D0FF",
+                                                stroke: "#fff",
+                                                strokeWidth: 3
                                           }}
                                     />
                               </AreaChart>

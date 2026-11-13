@@ -78,14 +78,21 @@ React Router 7, TanStack Query, Axios, Framer Motion, Recharts, Lucide.
 | `src/presentation/` | Composants, pages, hooks d'écran, styles |
 | `src/routes/` | Définition et garde des routes (`PrivateRoute`) |
 | `src/shared/` | Types et utilitaires transverses |
-| `src/services/` | Anciens services Axios directs — **dette technique**, ne pas y ajouter de nouveau code |
+
+**Accès réseau** : un seul client Axios (`src/infrastructure/api/apiClient.ts`) porte
+l'URL de base, l'injection du token et la normalisation des erreurs. Les contexts et
+hooks consomment les repositories exposés par `src/application/di/container.ts`
+(`repositories.auth`, `repositories.expenses`, `repositories.incomes`).
+`VITE_API_URL` peut être fourni avec ou sans `/api/v1` : le préfixe est normalisé une
+seule fois dans `src/infrastructure/api/endpoints.ts`.
 
 **Conventions** :
 - Composants en `.tsx` avec `PascalCase`, hooks en `useXxx.ts`.
 - Styles via classes Tailwind ; le CSS global reste dans `src/presentation/styles/index.css`.
 - L'interface et les messages utilisateur sont en **français**.
 - Pas de `any` dans le nouveau code ; typer les réponses API via `infrastructure/dtos` + mappers.
-- Ne jamais appeler `axios` depuis un composant : passer par un repository/use-case.
+- Ne jamais appeler `axios` depuis un composant, un context ou un hook : passer par un
+  repository (`repositories.*`). Aucun nouveau `import axios` hors de `src/infrastructure/`.
 - Toute nouvelle variable d'environnement publique doit être préfixée `VITE_` et documentée
   dans `frontend/.env.example`.
 

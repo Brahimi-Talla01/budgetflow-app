@@ -3,7 +3,8 @@ import image from '../../../assets/enfant.jpeg';
 import { useState } from 'react';
 import NotificationComponent from './NotificationComponent';
 import UserProfile from './UserProfile';
-import { useAuth } from '../../../application/context/AuthContext';
+import { useAuth } from '../../../application/context/authContext';
+import { getDisplayName } from '../../../domain/entities/User';
 
 const Navbar = () => {
 
@@ -15,9 +16,9 @@ const Navbar = () => {
             <header className='w-full h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10'>
                   
                   <UserProfile
-                        name={`${user?.firstname} ${user?.lastname}`}
+                        name={getDisplayName(user)}
                         level="Niveau Standard"
-                        image={user?.profileImage || image}
+                        image={image}
                   />
 
 

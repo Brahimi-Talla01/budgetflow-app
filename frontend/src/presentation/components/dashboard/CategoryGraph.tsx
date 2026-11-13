@@ -1,7 +1,7 @@
 import { PieChart, Pie, Sector, ResponsiveContainer, Cell } from "recharts";
 import StyledSelect from "./StyledSelect";
 import { useState, useMemo } from "react";
-import { useExpenses } from "../../../application/context/ExpenseContext";
+import { useExpenses } from "../../../application/context/expenseContext";
 
 const COLORS = ["#26D0FF", "#00C49F", "#FFBB28", "#FF8042", "#8b5cf6", "#f43f5e"];
 

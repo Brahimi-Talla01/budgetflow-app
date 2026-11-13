@@ -39,7 +39,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(({
     size = "default",
     ...props
 }, ref) => {
-    const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = React.useId();
+    const checkboxId = id ?? `checkbox-${generatedId}`;
 
     const sizeClasses: Record<CheckboxSize, string> = { 
         sm: "h-4 w-4",

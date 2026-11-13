@@ -30,7 +30,7 @@ const EditProfileCard: React.FC<EditProfileProps> = ({
       useEffect(() => {
             const handleClickOutside = (event: MouseEvent) => {
                   if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
-                         () => onClose;
+                         onClose();
                   }
             };
 
@@ -39,7 +39,7 @@ const EditProfileCard: React.FC<EditProfileProps> = ({
             return () => {
                   document.removeEventListener("mousedown", handleClickOutside);
             };
-      }, []);
+      }, [onClose]);
 
 
       return (
