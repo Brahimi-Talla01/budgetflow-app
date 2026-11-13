@@ -12,10 +12,44 @@ Consignes pour tout agent IA (ou développeur) travaillant sur ce dépôt.
 - Ne jamais committer de secrets : `.env` est ignoré, seuls les `.env.example` sont versionnés.
 - Messages de commit en français, à l'impératif, une ligne courte et explicite
   (ex. `Ajoute la validation du formulaire de dépense`).
-- Une branche par sujet (`feat/...`, `fix/...`, `chore/...`) ; la branche par défaut est `main`.
-- Pas de force-push sur `main`, pas de réécriture d'historique partagé.
+- Une branche par sujet ; **jamais de commit direct sur `main` ou `develop`** (voir § 2).
+- Pas de force-push sur `main` ni `develop`, pas de réécriture d'historique partagé.
 
-## 2. Structure du dépôt (monorepo)
+## 2. Branches et pull requests — OBLIGATOIRE
+
+Le dépôt suit un flux à deux branches protégées :
+
+| Branche | Rôle |
+| --- | --- |
+| `main` | état stable / livrable, mise à jour uniquement par PR depuis `develop` |
+| `develop` | branche d'intégration, mise à jour uniquement par PR depuis une branche de sujet |
+
+**Règles de collaboration**
+
+1. Toute modification part d'une branche créée depuis `develop` à jour :
+   ```bash
+   git checkout develop && git pull origin develop
+   git checkout -b feat/mon-sujet
+   ```
+2. Préfixes de branche : `feat/`, `fix/`, `chore/`, `docs/`, `ci/`, `refactor/`.
+   Une branche = un sujet ; ne pas mélanger refactor et fonctionnalité.
+3. **Aucun push direct sur `main` ou `develop`** : la protection GitHub est active,
+   y compris pour les administrateurs (`enforce_admins`), avec historique linéaire.
+4. La branche est poussée puis intégrée via une **pull request vers `develop`**
+   (squash merge, ce qui garde l'historique linéaire).
+5. Une mise en production se fait par une **pull request `develop` → `main`**,
+   mergée seulement quand `develop` est stable et la CI verte.
+6. Supprimer la branche de sujet après le merge, puis se remettre sur `develop`
+   (`git checkout develop && git pull --ff-only`).
+7. Ne jamais merger une PR dont la CI est rouge ; ne jamais contourner la protection
+   de branche.
+8. Les PR décrivent le quoi et le pourquoi, référencent l'issue si elle existe, et
+   restent petites pour être relisibles.
+
+> Exception unique : l'amorçage d'une branche ou d'un tag peut se faire via l'API GitHub
+> (création de `develop` par exemple), jamais par un commit direct.
+
+## 3. Structure du dépôt (monorepo)
 
 ```
 .
@@ -29,7 +63,7 @@ Consignes pour tout agent IA (ou développeur) travaillant sur ce dépôt.
 Chaque application garde son propre `package.json` / `requirements.txt` :
 il n'y a **pas** de gestionnaire de monorepo (pas de workspaces npm).
 
-## 3. Frontend (`frontend/`)
+## 4. Frontend (`frontend/`)
 
 **Stack** : React 19, TypeScript, Vite 7, Tailwind CSS v4 (`@tailwindcss/vite`),
 React Router 7, TanStack Query, Axios, Framer Motion, Recharts, Lucide.
@@ -64,7 +98,7 @@ npm run lint
 npm run preview
 ```
 
-## 4. Backend (`backend/`)
+## 5. Backend (`backend/`)
 
 **Stack** : Flask 3, Flask-JWT-Extended, Flask-SQLAlchemy, Alembic (Flask-Migrate),
 Flask-Bcrypt, Flask-CORS, PostgreSQL (`psycopg2`).
@@ -101,7 +135,7 @@ elle doit être remplacée hors développement.
 **Migrations** : toute modification de `app/models/` doit être accompagnée d'une migration
 (`flask --app manage.py db migrate -m "..."`), versionnée dans `migrations/versions/`.
 
-## 5. Vérifications avant de livrer
+## 6. Vérifications avant de livrer
 
 - Frontend : `npm run build` (compile TypeScript + Vite) et `npm run lint`.
 - Backend : au minimum `python -m compileall app` ; lancer les tests de `backend/tests/`
@@ -109,7 +143,7 @@ elle doit être remplacée hors développement.
 - Ne jamais désactiver une règle de lint, un test ou une assertion pour faire passer une
   vérification : corriger la cause.
 
-## 6. Sécurité
+## 7. Sécurité
 
 - `.env`, clés JWT, identifiants de base de données : jamais dans le dépôt.
 - CORS : restreindre les origines autorisées en production.
