@@ -1,19 +1,13 @@
-import { Helmet } from "react-helmet-async";
-import { useLocation } from "react-router-dom";
-
 interface Props {
       title: string;
 }
 
+/**
+ * React 19 hoiste automatiquement <title> dans <head> : plus besoin de
+ * react-helmet-async, qui ne déclare pas React 19 comme peer dependency.
+ */
 const PageTitle = ({ title }: Props) => {
-      
-      const location = useLocation();
-
-      return (
-            <Helmet key={location.pathname}>
-                  <title>{title} | BudgetFlow</title>
-            </Helmet>
-      );
+      return <title>{`${title} | BudgetFlow`}</title>;
 };
 
 export default PageTitle;
