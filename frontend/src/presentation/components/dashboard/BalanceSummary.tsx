@@ -1,8 +1,7 @@
 import { ArrowDownRight, ArrowUpRight, Wallet } from "lucide-react";
 import { useExpenses } from "../../../application/context/expenseContext";
 import { useIncomes } from "../../../application/context/incomeContext";
-
-const formatAmount = (value: number): string => `${value.toLocaleString("fr-FR")} XAF`;
+import { formatXAF } from "../../../shared/utils/currencyUtils";
 
 const BalanceSummary = () => {
       const { expenses } = useExpenses();
@@ -40,7 +39,7 @@ const BalanceSummary = () => {
                               <div>
                                     <p className="text-xs text-gray-500 mb-1">{card.label}</p>
                                     <p className={`text-xl font-bold ${card.className}`}>
-                                          {formatAmount(card.value)}
+                                          {formatXAF(card.value)}
                                     </p>
                               </div>
                               <span className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400">
