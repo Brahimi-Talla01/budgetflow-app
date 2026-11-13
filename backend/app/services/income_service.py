@@ -1,6 +1,7 @@
+from app.notifications.notification_manager import NotificationManager
 from app.repositories.income_repo import IncomeRepository
 from app.repositories.project_repo import ProjectRepository
-from app.notifications.notification_manager import NotificationManager
+from app.utils.dates import parse_date
 
 
 class IncomeService:
@@ -17,7 +18,8 @@ class IncomeService:
             if not project:
                 return None, "Projet introuvable ou non autorisé"
 
-        income = IncomeRepository.create_income(data, user_id)
+        payload = {**data, "date": parse_date(data["date"])}
+        income = IncomeRepository.create_income(payload, user_id)
 
         NotificationManager.on_income_created(income)
 
@@ -36,7 +38,12 @@ class IncomeService:
         income = IncomeRepository.get_income_by_id(income_id, user_id)
         if not income:
             return None
-        return IncomeRepository.update_income(income, data)
+
+        payload = {**data}
+        if "date" in payload:
+            payload["date"] = parse_date(payload["date"])
+
+        return IncomeRepository.update_income(income, payload)
 
     @staticmethod
     def delete_income(income_id, user_id):

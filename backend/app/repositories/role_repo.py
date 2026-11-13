@@ -1,5 +1,6 @@
-from app.models.role import RoleModel
 from app.extensions import db
+from app.models.role import RoleModel
+
 
 class RoleRepository:
 

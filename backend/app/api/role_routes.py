@@ -1,8 +1,9 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
+
 from app.schemas.role_shema import (
     RoleCreateSchema,
+    RoleResponseSchema,
     RoleUpdateSchema,
-    RoleResponseSchema
 )
 from app.services.role_service import RoleService
 
@@ -58,7 +59,7 @@ def update_role(role_id):
 
 @role_bp.delete("/<int:role_id>")
 def delete_role(role_id):
-    success, error = RoleService.delete_role(role_id)
+    _success, error = RoleService.delete_role(role_id)
 
     if error:
         return jsonify({"message": error}), 404

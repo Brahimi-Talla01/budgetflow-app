@@ -1,7 +1,6 @@
-from app.services.notification_service import NotificationService
 from app.repositories.project_repo import ProjectRepository
-from app.repositories.expense_repo import ExpenseRepository
-from app.repositories.income_repo import IncomeRepository
+from app.services.notification_service import NotificationService
+
 
 class NotificationManager:
 
@@ -33,7 +32,7 @@ class NotificationManager:
         project = ProjectRepository.get_user_project(project_id, user_id)
         if not project:
             return
-        
+
         total_incomes = sum(i.amount for i in project.incomes if i.isActive)
         total_expenses = sum(e.amount for e in project.expenses if e.isActive)
 

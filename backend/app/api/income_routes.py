@@ -1,10 +1,10 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.schemas.income_shema import (
     IncomeCreateSchema,
+    IncomeResponseSchema,
     IncomeUpdateSchema,
-    IncomeResponseSchema
 )
 from app.services.income_service import IncomeService
 
@@ -82,13 +82,13 @@ def update_income(income_id):
     }), 200
 
 
-# DELETE 
+# DELETE
 @income_bp.delete("/<int:income_id>")
 @jwt_required()
 def delete_income(income_id):
     user_id = int(get_jwt_identity())
 
-    deleted, error = IncomeService.delete_income(income_id, user_id)
+    _deleted, error = IncomeService.delete_income(income_id, user_id)
 
     if error:
         return jsonify({"message": error}), 404

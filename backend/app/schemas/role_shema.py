@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 # Créer un rôle
 class RoleCreateSchema(Schema):
     name = fields.String(

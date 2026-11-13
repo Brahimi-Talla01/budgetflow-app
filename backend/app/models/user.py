@@ -1,5 +1,7 @@
-from app.extensions import db, bcrypt
 from datetime import datetime
+
+from app.extensions import bcrypt, db
+
 
 class UserModel(db.Model):
     __tablename__ = "user_account"

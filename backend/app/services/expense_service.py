@@ -1,8 +1,9 @@
 from app.models.expense import ExpenseModel
-from app.repositories.expense_repo import ExpenseRepository
-from app.schemas.expense_schema import ExpenseSchema
-from app.repositories.project_repo import ProjectRepository
 from app.notifications.notification_manager import NotificationManager
+from app.repositories.expense_repo import ExpenseRepository
+from app.repositories.project_repo import ProjectRepository
+from app.schemas.expense_schema import ExpenseSchema
+from app.utils.dates import parse_date
 
 expense_schema = ExpenseSchema()
 expense_list_schema = ExpenseSchema(many=True)
@@ -31,9 +32,9 @@ class ExpenseService:
             amount=data["amount"],
             category=data["category"],
             description=data.get("description"),
-            date=data["date"],
-            userId=user_id,                          
-            projectId=data.get("projectId")           
+            date=parse_date(data["date"]),
+            userId=user_id,
+            projectId=data.get("projectId")
         )
 
         saved_expense = ExpenseRepository.create_expense(expense)
@@ -58,9 +59,12 @@ class ExpenseService:
             return None, "Non autorisé"
 
         # Mise à jour
-        for field in ["amount", "category", "description", "date", "projectId"]:
+        for field in ["amount", "category", "description", "projectId"]:
             if field in data:
                 setattr(expense, field, data[field])
+
+        if "date" in data:
+            expense.date = parse_date(data["date"])
 
         ExpenseRepository.update_expense(expense)
         return expense, None

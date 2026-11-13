@@ -1,22 +1,32 @@
 from flask import Flask
-from app.extensions import db, migrate, bcrypt, cors, jwt
-from app.congig import Config
-from app.models import (
-    UserModel,
-    RoleModel,
-    ExpenseModel,
-    IncomeModel,
-    ProjectModel,
-    NotificationModel
-)
 
 #Importation des routes
 from app.api.auth_routes import auth_bp
-from app.api.role_routes import role_bp
 from app.api.expense_routes import expense_bp
 from app.api.income_routes import income_bp
-from app.api.project_routes import project_bp
 from app.api.notification_routes import notification_bp
+from app.api.project_routes import project_bp
+from app.api.role_routes import role_bp
+from app.congig import Config
+from app.extensions import bcrypt, cors, db, jwt, migrate
+from app.models import (
+      ExpenseModel as ExpenseModel,
+)
+from app.models import (
+      IncomeModel as IncomeModel,
+)
+from app.models import (
+      NotificationModel as NotificationModel,
+)
+from app.models import (
+      ProjectModel as ProjectModel,
+)
+from app.models import (
+      RoleModel as RoleModel,
+)
+from app.models import (
+      UserModel as UserModel,
+)
 
 # Préfix global pour mes REST API
 api_prefix = "/api/v1"
@@ -47,5 +57,5 @@ def create_app():
       @app.route('/health')
       def health():
             return {"message": "Backend Running"}, 200
-      
+
       return app

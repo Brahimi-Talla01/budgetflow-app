@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 class UserCreateSchema(Schema):
     firstname = fields.String(required=True, validate=validate.Length(min=2, max=20))
     lastname = fields.String(required=True, validate=validate.Length(min=2, max=20))
