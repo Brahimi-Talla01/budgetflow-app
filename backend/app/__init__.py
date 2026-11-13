@@ -9,6 +9,7 @@ from app.api.income_routes import income_bp
 from app.api.notification_routes import notification_bp
 from app.api.project_routes import project_bp
 from app.api.role_routes import role_bp
+from app.api.transaction_routes import transaction_bp
 from app.config import Config
 from app.extensions import bcrypt, cors, db, jwt, migrate
 from app.models import (
@@ -59,6 +60,7 @@ def create_app():
       app.register_blueprint(role_bp, url_prefix=f"{api_prefix}/roles")
       app.register_blueprint(expense_bp, url_prefix=f"{api_prefix}/expenses")
       app.register_blueprint(income_bp, url_prefix=f"{api_prefix}/incomes")
+      app.register_blueprint(transaction_bp, url_prefix=f"{api_prefix}/transactions")
       app.register_blueprint(project_bp, url_prefix=f"{api_prefix}/projects")
       app.register_blueprint(notification_bp, url_prefix=f"{api_prefix}/notifications")
 

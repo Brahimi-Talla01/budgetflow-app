@@ -1,94 +1,81 @@
 import { useMemo, useState } from "react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import PageTitle from "../../components/ui/PageTitle";
+import AlertBanner from "../../components/ui/AlertBanner";
+import Pagination from "../../components/ui/Pagination";
 import { SkeletonList } from "../../components/ui/Skeleton";
 import TransactionFilters from "../../components/transactions/TransactionFilters";
 import TransactionList from "../../components/transactions/TransactionList";
-import type { TransactionRow, TransactionTypeFilter } from "../../components/transactions/types";
-import { useExpenses } from "../../../application/context/expenseContext";
-import { useIncomes } from "../../../application/context/incomeContext";
-import { isDateInPeriod, type PeriodValue } from "../../../shared/utils/dateUtils";
+import type { TransactionTypeFilter } from "../../components/transactions/types";
+import type { PaginationMeta, TransactionQuery } from "../../../domain/entities/Transaction";
+import { repositories } from "../../../application/di/container";
+import { queryKeys } from "../../../shared/constants/queryKeys";
+import { getErrorMessage } from "../../../shared/utils/errors";
+import type { PeriodValue } from "../../../shared/utils/dateUtils";
 import { formatXAF } from "../../../shared/utils/currencyUtils";
 
-const TransactionPage = () => {
-      const { expenses, loading: expensesLoading } = useExpenses();
-      const { incomes, loading: incomesLoading } = useIncomes();
+const EMPTY_PAGINATION: PaginationMeta = {
+      page: 1,
+      perPage: 5,
+      total: 0,
+      totalPages: 1,
+      hasPrevious: false,
+      hasNext: false,
+};
 
+const TransactionPage = () => {
       const [search, setSearch] = useState("");
       const [typeFilter, setTypeFilter] = useState<TransactionTypeFilter>("all");
       const [period, setPeriod] = useState<PeriodValue>("all");
       const [category, setCategory] = useState("all");
+      const [page, setPage] = useState(1);
+      const [perPage, setPerPage] = useState(5);
 
-      // Fusionne dépenses et revenus en une seule liste triée du plus récent au plus ancien.
-      const rows = useMemo<TransactionRow[]>(() => {
-            const expenseRows: TransactionRow[] = expenses.map((expense) => ({
-                  key: `expense-${expense.id}`,
-                  type: "expense",
-                  label: expense.description || expense.category,
-                  category: expense.category,
-                  amount: expense.amount,
-                  date: expense.date,
-                  description: expense.description,
-                  projectId: expense.projectId,
-            }));
-
-            const incomeRows: TransactionRow[] = incomes.map((income) => ({
-                  key: `income-${income.id}`,
-                  type: "income",
-                  label: income.description || income.source,
-                  category: income.source,
-                  amount: income.amount,
-                  date: income.date,
-                  description: income.description,
-                  projectId: income.projectId,
-            }));
-
-            return [...expenseRows, ...incomeRows].sort(
-                  (a, b) => b.date.getTime() - a.date.getTime()
-            );
-      }, [expenses, incomes]);
-
-      const categories = useMemo(
-            () => Array.from(new Set(rows.map((row) => row.category))).sort((a, b) => a.localeCompare(b, "fr")),
-            [rows]
+      const query = useMemo<TransactionQuery>(
+            () => ({ page, perPage, type: typeFilter, search, category, period }),
+            [page, perPage, typeFilter, search, category, period]
       );
 
-      const filteredRows = useMemo(() => {
-            const query = search.trim().toLowerCase();
+      const transactionsQuery = useQuery({
+            queryKey: queryKeys.transactions(query),
+            queryFn: () => repositories.transactions.list(query),
+            placeholderData: keepPreviousData,
+      });
 
-            return rows.filter((row) => {
-                  if (typeFilter !== "all" && row.type !== typeFilter) return false;
-                  if (category !== "all" && row.category !== category) return false;
-                  if (!isDateInPeriod(row.date, period)) return false;
+      const data = transactionsQuery.data;
+      const rows = data?.rows ?? [];
+      const pagination = data?.pagination ?? EMPTY_PAGINATION;
+      const summary = data?.summary ?? { incomes: 0, expenses: 0, balance: 0 };
+      const categories = data?.categories ?? [];
 
-                  if (query) {
-                        const haystack = `${row.label} ${row.category} ${row.description ?? ""}`.toLowerCase();
-                        if (!haystack.includes(query)) return false;
-                  }
+      const hasFilters =
+            search.trim() !== "" || typeFilter !== "all" || period !== "all" || category !== "all";
 
-                  return true;
-            });
-      }, [rows, typeFilter, category, period, search]);
-
-      const totals = useMemo(
-            () =>
-                  filteredRows.reduce(
-                        (acc, row) => {
-                              if (row.type === "income") acc.incomes += row.amount;
-                              else acc.expenses += row.amount;
-                              return acc;
-                        },
-                        { incomes: 0, expenses: 0 }
-                  ),
-            [filteredRows]
-      );
-
-      const balance = totals.incomes - totals.expenses;
-      const loading = expensesLoading || incomesLoading;
-      const hasAnyTransaction = rows.length > 0;
+      // Toute modification de filtre ou de taille de page ramène à la première page.
+      const handleSearchChange = (value: string) => {
+            setSearch(value);
+            setPage(1);
+      };
 
       const handleTypeChange = (value: TransactionTypeFilter) => {
             setTypeFilter(value);
             setCategory("all");
+            setPage(1);
+      };
+
+      const handlePeriodChange = (value: PeriodValue) => {
+            setPeriod(value);
+            setPage(1);
+      };
+
+      const handleCategoryChange = (value: string) => {
+            setCategory(value);
+            setPage(1);
+      };
+
+      const handlePerPageChange = (value: number) => {
+            setPerPage(value);
+            setPage(1);
       };
 
       return (
@@ -98,21 +85,21 @@ const TransactionPage = () => {
                   <div className="flex flex-col gap-2">
                         <h1 className="text-xl md:text-3xl font-bold text-dark">Transactions</h1>
                         <p className="text-sm text-gray-600">
-                              {rows.length} transaction{rows.length > 1 ? "s" : ""} enregistrée
-                              {rows.length > 1 ? "s" : ""}
+                              {pagination.total} transaction{pagination.total > 1 ? "s" : ""} enregistrée
+                              {pagination.total > 1 ? "s" : ""}
                         </p>
                   </div>
 
                   <div className="mt-4">
                         <TransactionFilters
                               search={search}
-                              onSearchChange={setSearch}
+                              onSearchChange={handleSearchChange}
                               type={typeFilter}
                               onTypeChange={handleTypeChange}
                               period={period}
-                              onPeriodChange={setPeriod}
+                              onPeriodChange={handlePeriodChange}
                               category={category}
-                              onCategoryChange={setCategory}
+                              onCategoryChange={handleCategoryChange}
                               categories={categories}
                         />
                   </div>
@@ -120,34 +107,58 @@ const TransactionPage = () => {
                   <div className="bg-white rounded-xl p-4 md:p-6 mt-4">
                         <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                               <h2 className="text-lg font-semibold text-dark">
-                                    {filteredRows.length} résultat{filteredRows.length > 1 ? "s" : ""}
+                                    {pagination.total} résultat{pagination.total > 1 ? "s" : ""}
+                                    {transactionsQuery.isFetching && !transactionsQuery.isLoading ? (
+                                          <span className="ml-2 text-xs font-normal text-gray-400">mise à jour…</span>
+                                    ) : null}
                               </h2>
 
                               <div className="flex flex-wrap items-center gap-4 text-sm">
                                     <span className="text-green-600 font-medium">
-                                          Revenus {formatXAF(totals.incomes)}
+                                          Revenus {formatXAF(summary.incomes)}
                                     </span>
                                     <span className="text-red-600 font-medium">
-                                          Dépenses {formatXAF(totals.expenses)}
+                                          Dépenses {formatXAF(summary.expenses)}
                                     </span>
-                                    <span className={`font-semibold ${balance >= 0 ? "text-primary" : "text-red-600"}`}>
-                                          Solde {formatXAF(balance)}
+                                    <span className={`font-semibold ${summary.balance >= 0 ? "text-primary" : "text-red-600"}`}>
+                                          Solde {formatXAF(summary.balance)}
                                     </span>
                               </div>
                         </div>
 
-                        {loading && !hasAnyTransaction ? (
+                        {transactionsQuery.isError && (
+                              <AlertBanner
+                                    kind="error"
+                                    message={getErrorMessage(
+                                          transactionsQuery.error,
+                                          "Impossible de charger les transactions."
+                                    )}
+                                    className="my-2"
+                              />
+                        )}
+
+                        {transactionsQuery.isLoading ? (
                               <SkeletonList rows={4} />
                         ) : (
                               <TransactionList
-                                    rows={filteredRows}
+                                    rows={rows}
                                     emptyMessage={
-                                          hasAnyTransaction
+                                          hasFilters
                                                 ? "Aucune transaction ne correspond à ces filtres."
                                                 : "Aucune transaction enregistrée pour le moment."
                                     }
                               />
                         )}
+
+                        <Pagination
+                              page={pagination.page}
+                              perPage={pagination.perPage}
+                              total={pagination.total}
+                              totalPages={pagination.totalPages}
+                              onPageChange={setPage}
+                              onPerPageChange={handlePerPageChange}
+                              disabled={transactionsQuery.isFetching}
+                        />
                   </div>
             </>
       );
