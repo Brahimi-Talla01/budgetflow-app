@@ -45,16 +45,20 @@ npm run dev                        # http://localhost:5173
 | `npm run dev` | `frontend/` | serveur de développement Vite |
 | `npm run build` | `frontend/` | vérification TypeScript + build de production |
 | `npm run lint` | `frontend/` | ESLint |
-
-La CI GitHub Actions (`.github/workflows/ci.yml`) vérifie le lint, le build et le
-chargement de l'API sur chaque pull request vers `develop` et `main`.
+| `npm test` | `frontend/` | tests Vitest |
 | `python manage.py` | `backend/` | serveur Flask (mode debug) |
 | `flask --app manage.py db upgrade` | `backend/` | applique les migrations Alembic |
+| `pytest -q` | `backend/` | tests pytest |
+| `ruff check app tests` | `backend/` | lint Python |
+
+La CI GitHub Actions (`.github/workflows/ci.yml`) vérifie le lint, les tests, le build
+et le démarrage de l'API sur chaque pull request vers `develop` et `main`.
 
 ## Documentation
 
 - Conventions de code, architecture et règles Git : [`AGENTS.md`](AGENTS.md)
-- Prochains chantiers et dette technique : [`context/PLAN.md`](context/PLAN.md)
+- Plan de livraison et état d'avancement : [`context/PLAN.md`](context/PLAN.md)
+- Procédure de mise en production : [`context/DEPLOYMENT.md`](context/DEPLOYMENT.md)
 - Frontend : [`frontend/README.md`](frontend/README.md)
 - Backend : [`backend/README.md`](backend/README.md)
 

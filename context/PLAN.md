@@ -41,10 +41,11 @@ Monorepo `budgetflow-app` (public) :
 
 Déclenchée sur toute PR et tout push vers `main`/`develop` :
 
-- **Frontend (lint + build)** : `npm ci`, `npm run lint`, `npm run build`
-- **Backend (compile + démarrage)** : `pip install -r requirements.txt`, `compileall`, chargement de l'application Flask sur SQLite
+- **Frontend (lint + build + tests)** : `npm ci`, `npm run lint`, `npm run build`, `npm test` (Vitest)
+- **Backend (lint + tests + démarrage)** : `pip install -r requirements-dev.txt`, `ruff check app tests`,
+  `compileall`, `pytest -q`, chargement de l'application Flask
 
-Les deux checks sont obligatoires. Il n'y a **aucun test automatisé** pour l'instant (voir lot 3).
+Les deux checks sont obligatoires.
 
 ---
 
@@ -65,6 +66,11 @@ Les deux checks sont obligatoires. Il n'y a **aucun test automatisé** pour l'in
   vue « Revenu » du graphique, `useId` conditionnel, `Math.random` au rendu,
   `setState` dans `useMemo`, date vidée dans le modal, double modal,
   fuite de données après déconnexion, fermeture de `EditProfileCard`
+
+### PRs #6 à #11 — Lots 1 à 5
+Fonctionnel complet (revenus, projets, analyse, conseils, notifications), tests frontend/backend,
+sécurité (session cookie + CSRF, CORS restreint, erreurs unifiées) et performance
+(découpage des routes, assets hors bundle, TanStack Query, squelettes, accessibilité).
 
 ### PR #3 — CI
 Workflow GitHub Actions + remplacement de `react-helmet-async` (incompatible React 19)
@@ -181,10 +187,13 @@ Critère d'acceptation : plus d'avertissement de chunk > 500 kB au build.
 
 ### Lot 6 — Release
 
-- [ ] PR `develop` → `main` une fois les lots 1 à 3 terminés
-- [ ] Tag de version (`v0.1.0`) et notes de version
-- [ ] Déploiement (frontend statique + API) et variables d'environnement documentées
-- [ ] Sauvegarde / restauration de la base PostgreSQL
+- [x] PR `develop` → `main` une fois les lots 1 à 6 terminés
+- [x] Tag de version (`v0.1.0`) et notes de version
+- [x] Procédure de déploiement et variables d'environnement documentées : [`DEPLOYMENT.md`](DEPLOYMENT.md)
+- [x] Commandes de sauvegarde / restauration PostgreSQL documentées (à planifier sur l'infrastructure)
+
+> Le déploiement effectif et la planification des sauvegardes nécessitent un accès à
+> l'infrastructure cible : ils restent à exécuter en suivant `context/DEPLOYMENT.md`.
 
 ---
 
