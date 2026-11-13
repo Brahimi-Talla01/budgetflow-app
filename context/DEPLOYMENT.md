@@ -3,6 +3,68 @@
 Procédure de mise en production. Aucun déploiement n'est automatisé : les étapes
 ci-dessous sont à exécuter sur l'infrastructure cible.
 
+## 0. Tester avec Docker (recommandé)
+
+Un seul conteneur applicatif sert **le frontend et l'API** derrière nginx ;
+PostgreSQL tourne dans un second conteneur (volume persistant). Seule l'URL
+`http://localhost:8080` est exposée.
+
+```bash
+cp .env.example .env      # puis renseigner JWT_SECRET_KEY et POSTGRES_PASSWORD
+docker compose up -d --build
+docker compose ps         # les deux services doivent être « healthy »
+```
+
+Ouvrir <http://localhost:8080>.
+
+### Reprendre une base PostgreSQL existante
+
+Le script copie la base locale indiquée par `DATABASE_URL` (dans `backend/.env`)
+vers le volume Docker, sans toucher à la source :
+
+```bash
+./scripts/import-db.sh      # démarre db, sauvegarde, restaure, liste les comptes
+docker compose up -d app
+```
+
+### Variables d'environnement Docker (`.env` à la racine)
+
+| Variable | Rôle |
+| --- | --- |
+| `APP_PORT` | port public (défaut `8080`) |
+| `APP_ENV` | `production` en conteneur |
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | base interne ; le mot de passe est obligatoire |
+| `JWT_SECRET_KEY` | signature des JWT, obligatoire (`openssl rand -hex 32`) |
+| `JWT_COOKIE_SECURE` | `false` en HTTP local, `true` derrière HTTPS |
+| `JWT_COOKIE_SAMESITE` | `Lax` (même domaine) |
+| `CORS_ORIGINS` | URL du frontend, ex. `http://localhost:8080` |
+| `GUNICORN_WORKERS` | nombre de workers (défaut `3`) |
+
+Le frontend est compilé avec `VITE_API_URL=/api/v1` (appels relatifs, même origine,
+donc pas de CORS ni de cookie tiers).
+
+### Comptes et mots de passe
+
+Les mots de passe sont hachés avec bcrypt : **ils ne peuvent pas être récupérés**.
+Pour retrouver les comptes importés et en réinitialiser un :
+
+```bash
+docker compose exec app flask --app manage.py users-list
+docker compose exec app flask --app manage.py user-set-password --email vous@example.com
+```
+
+### Commandes utiles
+
+```bash
+docker compose logs -f app          # logs nginx + gunicorn
+docker compose exec app flask --app manage.py db upgrade
+docker compose down                 # arrêt (les données restent dans le volume)
+docker compose down -v              # arrêt + suppression des données du conteneur
+```
+
+> `docker compose down -v` supprime la base du conteneur. La base locale d'origine
+> n'est jamais modifiée par ces commandes.
+
 ## 1. Variables d'environnement
 
 ### Backend (`backend/.env` ou variables de la plateforme)
@@ -25,7 +87,7 @@ Le démarrage échoue volontairement si `APP_ENV=production` sans `JWT_SECRET_KE
 | --- | --- |
 | `VITE_API_URL` | `https://api.budgetflow.example` (le `/api/v1` est ajouté automatiquement) |
 
-## 2. Backend
+## 2. Backend (sans Docker)
 
 ```bash
 cd backend
