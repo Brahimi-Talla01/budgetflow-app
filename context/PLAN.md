@@ -108,7 +108,7 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | Couches inutilisées | interfaces notification/projet, use-cases, `DIContext.tsx` vides | `domain/`, `application/` |
 | TanStack Query inutilisé | dépendance installée mais aucun `QueryClient` | `main.tsx` |
 | Session | token en `localStorage`, pas de refresh token | `infrastructure/storage/` |
-| Poids du bundle | 892 kB de JS et une vidéo de 17 MB dans le bundle, blob de commentaires retiré mais assets à traiter | `src/assets/` |
+| Assets | vidéo de 17 MB servie depuis `public/assets/` (hors bundle JS), images idem | `public/assets/` |
 
 ### Backend
 
@@ -170,11 +170,12 @@ Critère d'acceptation : démarrage impossible sans secret en production, aucune
 
 ### Lot 5 — Performance et UX
 
-- [ ] Code splitting par route (`React.lazy` + `Suspense`), objectif < 300 kB par chunk
-- [ ] Sortir la vidéo et les images lourdes du bundle (dossier `public/` ou CDN)
-- [ ] Adopter TanStack Query pour le cache, les revalidations et les états de chargement
-- [ ] Skeletons au lieu des spinners pleine page
-- [ ] Passe d'accessibilité (labels, focus, contrastes, navigation clavier du modal)
+- [x] Code splitting par route (`React.lazy` + `Suspense`) : plus aucun chunk > 500 kB
+  (principal ~368 kB, recharts ~336 kB, pages de 3 à 159 kB)
+- [x] Sortir la vidéo et les images lourdes du bundle (`public/assets/`)
+- [x] Adopter TanStack Query : cache par clé, invalidations après mutation, mise à jour optimiste des notifications
+- [x] Skeletons au lieu des spinners pleine page (dashboard, transactions, projets)
+- [x] Passe d'accessibilité : modal `role="dialog"`, fermeture Échap, `aria-label` sur les boutons icône
 
 Critère d'acceptation : plus d'avertissement de chunk > 500 kB au build.
 

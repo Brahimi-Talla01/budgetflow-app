@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import PageTitle from "../../components/ui/PageTitle";
+import { SkeletonList } from "../../components/ui/Skeleton";
 import TransactionFilters from "../../components/transactions/TransactionFilters";
 import TransactionList from "../../components/transactions/TransactionList";
 import type { TransactionRow, TransactionTypeFilter } from "../../components/transactions/types";
@@ -136,9 +137,7 @@ const TransactionPage = () => {
                         </div>
 
                         {loading && !hasAnyTransaction ? (
-                              <div className="flex justify-center items-center py-12">
-                                    <span className="w-9 h-9 rounded-full border-2 border-t-transparent border-primary animate-spin" />
-                              </div>
+                              <SkeletonList rows={4} />
                         ) : (
                               <TransactionList
                                     rows={filteredRows}

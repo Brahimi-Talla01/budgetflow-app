@@ -11,6 +11,7 @@ import { useState } from "react"
 import AlertBanner, { type FeedbackKind } from "../../components/ui/AlertBanner"
 import type { TransactionPayload } from "../../../domain/entities/Expense"
 import PageTitle from "../../components/ui/PageTitle"
+import { Skeleton } from "../../components/ui/Skeleton"
 
 interface Feedback {
     kind: FeedbackKind;
@@ -55,12 +56,21 @@ const DashboardPage = () => {
     
     const isEmpty = topExpenses.length === 0;
 
-    // Ne pas remplacer tout le dashboard par un spinner lors d'une création :
+    // Ne pas remplacer tout le dashboard par un squelette lors d'une création :
     // le message de retour doit rester visible.
     if (loading && expenses.length === 0) return (
-        <div className='flex justify-center items-center h-3/4'>
-            <span className='w-11 h-11 my-1 rounded-full border-3 border-t-transparent border-primary animate-spin'></span>
-        </div>
+        <>
+            <PageTitle title="Dashboard" />
+            <div className='mt-6 space-y-4' role="status" aria-label="Chargement du tableau de bord">
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+                    <Skeleton className='h-20' />
+                    <Skeleton className='h-20' />
+                    <Skeleton className='h-20' />
+                </div>
+                <Skeleton className='h-80' />
+                <Skeleton className='h-64' />
+            </div>
+        </>
     );
 
     return (

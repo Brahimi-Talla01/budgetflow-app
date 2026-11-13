@@ -1,92 +1,116 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
       CreateProjectPayload,
-      ProjectProps,
       UpdateProjectPayload,
 } from "../../domain/entities/Project";
 import { getErrorMessage } from "../../shared/utils/errors";
+import { queryKeys } from "../../shared/constants/queryKeys";
 import { repositories } from "../di/container";
 import { useAuth } from "./authContext";
 import { ProjectContext } from "./projectContext";
 
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
       const { isAuthenticated } = useAuth();
-      const [projects, setProjects] = useState<ProjectProps[]>([]);
-      const [loading, setLoading] = useState(false);
-      const [error, setError] = useState<string | null>(null);
+      const queryClient = useQueryClient();
+
+      const projectsQuery = useQuery({
+            queryKey: queryKeys.projects,
+            queryFn: () => repositories.projects.list(),
+            enabled: isAuthenticated,
+      });
+
+      const invalidate = () => {
+            void queryClient.invalidateQueries({ queryKey: queryKeys.projects });
+      };
+
+      const createMutation = useMutation({
+            mutationFn: (payload: CreateProjectPayload) => repositories.projects.create(payload),
+            onSuccess: invalidate,
+      });
+
+      const updateMutation = useMutation({
+            mutationFn: ({ id, payload }: { id: number; payload: UpdateProjectPayload }) =>
+                  repositories.projects.update(id, payload),
+            onSuccess: invalidate,
+      });
+
+      const deleteMutation = useMutation({
+            mutationFn: (id: number) => repositories.projects.remove(id),
+            onSuccess: invalidate,
+      });
 
       const refresh = useCallback(async () => {
-            if (!isAuthenticated) return;
-
-            setLoading(true);
-            try {
-                  const data = await repositories.projects.list();
-                  setProjects(data);
-                  setError(null);
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de charger les projets."));
-            } finally {
-                  setLoading(false);
-            }
-      }, [isAuthenticated]);
+            await projectsQuery.refetch();
+      }, [projectsQuery]);
 
       const createProject = useCallback(async (payload: CreateProjectPayload) => {
             if (!isAuthenticated) return false;
 
             try {
-                  const created = await repositories.projects.create(payload);
-                  setProjects((prev) => [...prev, created]);
-                  setError(null);
+                  await createMutation.mutateAsync(payload);
                   return true;
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de créer ce projet."));
+            } catch {
                   return false;
             }
-      }, [isAuthenticated]);
+      }, [isAuthenticated, createMutation]);
 
       const updateProject = useCallback(async (id: number, payload: UpdateProjectPayload) => {
             if (!isAuthenticated) return false;
 
             try {
-                  const updated = await repositories.projects.update(id, payload);
-                  setProjects((prev) => prev.map((project) => (project.id === id ? updated : project)));
-                  setError(null);
+                  await updateMutation.mutateAsync({ id, payload });
                   return true;
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de modifier ce projet."));
+            } catch {
                   return false;
             }
-      }, [isAuthenticated]);
+      }, [isAuthenticated, updateMutation]);
 
       const deleteProject = useCallback(async (id: number) => {
             if (!isAuthenticated) return false;
 
             try {
-                  await repositories.projects.remove(id);
-                  setProjects((prev) => prev.filter((project) => project.id !== id));
-                  setError(null);
+                  await deleteMutation.mutateAsync(id);
                   return true;
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de supprimer ce projet."));
+            } catch {
                   return false;
             }
-      }, [isAuthenticated]);
+      }, [isAuthenticated, deleteMutation]);
 
-      useEffect(() => {
-            void refresh();
-      }, [refresh]);
+      const errorSource = projectsQuery.error
+            ?? createMutation.error
+            ?? updateMutation.error
+            ?? deleteMutation.error;
 
       const value = useMemo(
             () => ({
-                  projects: isAuthenticated ? projects : [],
-                  loading,
-                  error,
+                  projects: isAuthenticated ? (projectsQuery.data ?? []) : [],
+                  loading:
+                        projectsQuery.isLoading ||
+                        createMutation.isPending ||
+                        updateMutation.isPending ||
+                        deleteMutation.isPending,
+                  error: errorSource
+                        ? getErrorMessage(errorSource, "Une erreur est survenue avec les projets.")
+                        : null,
                   refresh,
                   createProject,
                   updateProject,
                   deleteProject,
             }),
-            [isAuthenticated, projects, loading, error, refresh, createProject, updateProject, deleteProject]
+            [
+                  isAuthenticated,
+                  projectsQuery.data,
+                  projectsQuery.isLoading,
+                  createMutation.isPending,
+                  updateMutation.isPending,
+                  deleteMutation.isPending,
+                  errorSource,
+                  refresh,
+                  createProject,
+                  updateProject,
+                  deleteProject,
+            ]
       );
 
       return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormValidation } from "../../../application/hooks/useFormValidation";
 import { AlertCircle, Briefcase, Calendar, DollarSign, FileText, Tag, TrendingDown, TrendingUp, X } from "lucide-react";
 import { useExpenses } from "../../../application/context/expenseContext";
@@ -31,6 +31,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
         resetForm();
         onClose();
     }, [resetForm, onClose]);
+
+    // Accessibilité : fermeture au clavier.
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") handleClose();
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [isOpen, handleClose]);
 
     const handleSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
@@ -79,15 +91,21 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
             />
 
             {/* Modal */}
-            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4 transform transition-all duration-300 scale-100 opacity-100">
+            <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="transaction-modal-title"
+                className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4 transform transition-all duration-300 scale-100 opacity-100"
+            >
                 
                 {/* Header */}
                 <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
-                    <h2 className="text-2xl font-bold text-gray-900">
+                    <h2 id="transaction-modal-title" className="text-2xl font-bold text-gray-900">
                         Nouvelle Transaction
                     </h2>
                     <button 
                         onClick={handleClose}
+                        aria-label="Fermer la fenêtre de transaction"
                         className="p-2 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
                     >
                         <X className="w-6 h-6 text-gray-400" />
