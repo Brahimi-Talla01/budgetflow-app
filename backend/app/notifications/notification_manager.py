@@ -9,7 +9,8 @@ class NotificationManager:
         NotificationService.create_notification(
             title="Nouvelle dépense",
             message=f"Vous avez ajouté une dépense de {expense.amount} FCFA.",
-            user_id=expense.userId
+            user_id=expense.userId,
+            link=f"/dashboard/transaction/expense/{expense.expenseId}",
         )
 
         # Si associée à un projet → then check progression
@@ -21,7 +22,8 @@ class NotificationManager:
         NotificationService.create_notification(
             title="Nouveau revenu",
             message=f"Vous avez enregistré un revenu de {income.amount} FCFA.",
-            user_id=income.userId
+            user_id=income.userId,
+            link=f"/dashboard/transaction/income/{income.incomeId}",
         )
 
         if income.projectId:
@@ -44,11 +46,13 @@ class NotificationManager:
             NotificationService.create_notification(
                 title="Projet réussi",
                 message=f"Votre projet '{project.name}' a atteint son objectif !",
-                user_id=user_id
+                user_id=user_id,
+                link=f"/dashboard/projet/{project.projectId}",
             )
         elif percentage >= 50:
             NotificationService.create_notification(
                 title="Projet à moitié atteint",
                 message=f"Vous avez atteint 50% de votre objectif pour '{project.name}'.",
-                user_id=user_id
+                user_id=user_id,
+                link=f"/dashboard/projet/{project.projectId}",
             )

@@ -5,11 +5,12 @@ from app.repositories.notification_repo import NotificationRepository
 class NotificationService:
 
     @staticmethod
-    def create_notification(title, message, user_id):
+    def create_notification(title, message, user_id, link=None):
         notif = NotificationModel(
             title=title,
             message=message,
-            userId=user_id
+            userId=user_id,
+            link=link,
         )
         return NotificationRepository.create_notification(notif)
 

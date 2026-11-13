@@ -6,6 +6,7 @@ import type { TransactionRow } from "./types";
 const rows: TransactionRow[] = [
       {
             key: "income-1",
+            id: 1,
             type: "income",
             label: "Salaire mensuel",
             category: "Salaire",
@@ -14,6 +15,7 @@ const rows: TransactionRow[] = [
       },
       {
             key: "expense-2",
+            id: 2,
             type: "expense",
             label: "Courses",
             category: "Alimentation",

@@ -7,6 +7,8 @@ export type TransactionTypeFilter = "all" | TransactionType;
 export interface TransactionRow {
       /** Identifiant unique préfixé par le type ("expense-12", "income-3"). */
       key: string;
+      /** Identifiant de la dépense ou du revenu. */
+      id: number;
       type: TransactionType;
       /** Description si présente, sinon catégorie / source. */
       label: string;

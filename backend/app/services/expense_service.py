@@ -49,6 +49,16 @@ class ExpenseService:
         return expense_list_schema.dump(expenses)
 
     @staticmethod
+    def get_expense(expense_id, user_id):
+        expense = ExpenseRepository.get_expense_by_id(expense_id)
+
+        # Ne pas révéler l'existence d'une dépense appartenant à un autre compte.
+        if not expense or expense.userId != user_id:
+            return None
+
+        return expense_schema.dump(expense)
+
+    @staticmethod
     def update_expense(expense_id, data, user_id):
         expense = ExpenseRepository.get_expense_by_id(expense_id)
         if not expense:

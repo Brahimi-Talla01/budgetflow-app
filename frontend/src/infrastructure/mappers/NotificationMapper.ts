@@ -7,6 +7,7 @@ export class NotificationMapper {
                   id: dto.notificationId,
                   title: dto.title,
                   message: dto.message,
+                  link: dto.link ?? undefined,
                   isRead: dto.isRead,
                   createdAt: new Date(dto.createdAt),
                   userId: dto.userId,

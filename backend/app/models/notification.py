@@ -9,6 +9,8 @@ class NotificationModel(db.Model):
     notificationId = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     message = db.Column(db.String(255), nullable=False)
+    # Route interne vers laquelle rediriger quand la notification est ouverte.
+    link = db.Column(db.String(255), nullable=True)
     isRead = db.Column(db.Boolean, default=False, nullable=False)
 
     # Dates
@@ -25,6 +27,7 @@ class NotificationModel(db.Model):
             "notificationId": self.notificationId,
             "title": self.title,
             "message": self.message,
+            "link": self.link,
             "isRead": self.isRead,
             "createdAt": self.createdAt.isoformat(),
             "userId": self.userId,

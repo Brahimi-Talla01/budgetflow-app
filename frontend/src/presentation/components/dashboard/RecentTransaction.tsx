@@ -35,6 +35,7 @@ const RecentTransaction = () => {
 
       // Parser les données API 
       const parsedExpenses = expenses.map((exp) => ({
+            id: exp.id,
             title: exp.description || exp.category,
             price: exp.amount,
             date: new Date(exp.date).toLocaleDateString("fr-FR"),
