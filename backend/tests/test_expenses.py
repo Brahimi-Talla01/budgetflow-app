@@ -75,13 +75,13 @@ def test_expense_is_isolated_between_users(client, auth_headers, user_role_id):
         "roleId": user_role_id,
     }
     client.post("/api/v1/auth/register", json=other_payload)
-    other_token = client.post(
+    # La connexion remplace les cookies de session du client de test.
+    response = client.post(
         "/api/v1/auth/login",
         json={"email": "autre@budgetflow.test", "password": "motdepasse123"},
-    ).get_json()["access_token"]
-
-    response = client.get(
-        "/api/v1/expenses/", headers={"Authorization": f"Bearer {other_token}"}
     )
+    assert response.status_code == 200
+
+    response = client.get("/api/v1/expenses/")
 
     assert response.get_json() == []

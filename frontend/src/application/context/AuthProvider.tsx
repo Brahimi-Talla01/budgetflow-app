@@ -2,37 +2,62 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react
 import { useNavigate } from "react-router-dom";
 import type { User } from "../../domain/entities/User";
 import { setUnauthorizedHandler } from "../../infrastructure/api/apiClient";
-import { tokenStorage } from "../../infrastructure/storage/TokenStorageService";
+import { repositories } from "../di/container";
 import { AuthContext } from "./authContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const navigate = useNavigate();
-      const [token, setToken] = useState<string | null>(() => tokenStorage.getToken());
-      const [user, setUser] = useState<User | null>(() => tokenStorage.getUser());
+      const [user, setUser] = useState<User | null>(null);
+      const [isInitializing, setIsInitializing] = useState(true);
 
-      const login = useCallback((nextUser: User, nextToken: string) => {
-            tokenStorage.setToken(nextToken);
-            tokenStorage.setUser(nextUser);
+      const login = useCallback((nextUser: User) => {
             setUser(nextUser);
-            setToken(nextToken);
       }, []);
 
       const logout = useCallback(() => {
-            tokenStorage.clearSession();
             setUser(null);
-            setToken(null);
+            // Ferme aussi la session côté serveur (suppression du cookie).
+            void repositories.auth.logout().catch(() => undefined);
             navigate("/");
       }, [navigate]);
 
-      // Une réponse 401 ferme la session et renvoie l'utilisateur à l'accueil.
+      // Restauration de la session : le cookie httpOnly est envoyé automatiquement.
+      useEffect(() => {
+            let cancelled = false;
+
+            const restoreSession = async () => {
+                  try {
+                        const currentUser = await repositories.auth.me();
+                        if (!cancelled) setUser(currentUser);
+                  } catch {
+                        if (!cancelled) setUser(null);
+                  } finally {
+                        if (!cancelled) setIsInitializing(false);
+                  }
+            };
+
+            void restoreSession();
+
+            return () => {
+                  cancelled = true;
+            };
+      }, []);
+
+      // Une réponse 401 (hors restauration de session) ferme la session.
       useEffect(() => {
             setUnauthorizedHandler(logout);
             return () => setUnauthorizedHandler(null);
       }, [logout]);
 
       const value = useMemo(
-            () => ({ user, token, login, logout, isAuthenticated: Boolean(token) }),
-            [user, token, login, logout]
+            () => ({
+                  user,
+                  isAuthenticated: Boolean(user),
+                  isInitializing,
+                  login,
+                  logout,
+            }),
+            [user, isInitializing, login, logout]
       );
 
       return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

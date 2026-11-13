@@ -14,13 +14,13 @@ const toUpdatePayload = (data: Partial<IncomeProps>) => ({
 });
 
 export const IncomeProvider = ({ children }: { children: ReactNode }) => {
-      const { token } = useAuth();
+      const { isAuthenticated } = useAuth();
       const [incomes, setIncomes] = useState<IncomeProps[]>([]);
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState<string | null>(null);
 
       const fetchIncomes = useCallback(async () => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -32,10 +32,10 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const createIncome = useCallback(async (dto: CreateIncomeDTO): Promise<boolean> => {
-            if (!token) return false;
+            if (!isAuthenticated) return false;
 
             setLoading(true);
             try {
@@ -49,10 +49,10 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const updateIncome = useCallback(async (id: number, data: Partial<IncomeProps>) => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -64,10 +64,10 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const deleteIncome = useCallback(async (id: number) => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -79,7 +79,7 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       useEffect(() => {
             void fetchIncomes();
@@ -87,7 +87,7 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
 
       const value = useMemo(
             () => ({
-                  incomes: token ? incomes : [],
+                  incomes: isAuthenticated ? incomes : [],
                   loading,
                   error,
                   fetchIncomes,
@@ -95,7 +95,7 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
                   updateIncome,
                   deleteIncome,
             }),
-            [token, incomes, loading, error, fetchIncomes, createIncome, updateIncome, deleteIncome]
+            [isAuthenticated, incomes, loading, error, fetchIncomes, createIncome, updateIncome, deleteIncome]
       );
 
       return <IncomeContext.Provider value={value}>{children}</IncomeContext.Provider>;

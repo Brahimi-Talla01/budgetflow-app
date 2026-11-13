@@ -59,10 +59,13 @@ def register_payload(user_role_id):
 
 @pytest.fixture()
 def auth_headers(client, register_payload):
+    """Connecte le client (cookie httpOnly) et renvoie l'en-tête CSRF."""
     client.post("/api/v1/auth/register", json=register_payload)
-    response = client.post(
+    client.post(
         "/api/v1/auth/login",
         json={"email": USER_EMAIL, "password": USER_PASSWORD},
     )
-    token = response.get_json()["access_token"]
-    return {"Authorization": f"Bearer {token}"}
+    csrf_cookie = client.get_cookie("csrf_access_token")
+    assert csrf_cookie is not None, "le cookie CSRF doit être émis à la connexion"
+
+    return {"X-CSRF-TOKEN": csrf_cookie.value}

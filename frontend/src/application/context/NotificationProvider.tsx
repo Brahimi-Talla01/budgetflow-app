@@ -6,13 +6,13 @@ import { useAuth } from "./authContext";
 import { NotificationContext } from "./notificationContext";
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-      const { token } = useAuth();
+      const { isAuthenticated } = useAuth();
       const [notifications, setNotifications] = useState<NotificationProps[]>([]);
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState<string | null>(null);
 
       const refresh = useCallback(async () => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -24,7 +24,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const markAsRead = useCallback(async (id: number) => {
             const target = notifications.find((notification) => notification.id === id);
@@ -60,14 +60,14 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
       const value = useMemo(
             () => ({
-                  notifications: token ? notifications : [],
-                  unreadCount: token ? unreadCount : 0,
+                  notifications: isAuthenticated ? notifications : [],
+                  unreadCount: isAuthenticated ? unreadCount : 0,
                   loading,
                   error,
                   refresh,
                   markAsRead,
             }),
-            [token, notifications, unreadCount, loading, error, refresh, markAsRead]
+            [isAuthenticated, notifications, unreadCount, loading, error, refresh, markAsRead]
       );
 
       return (

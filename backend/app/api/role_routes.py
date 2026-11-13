@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from app.schemas.role_shema import (
+from app.schemas.role_schema import (
     RoleCreateSchema,
     RoleResponseSchema,
     RoleUpdateSchema,

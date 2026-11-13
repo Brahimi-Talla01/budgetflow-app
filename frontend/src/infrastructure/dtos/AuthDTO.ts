@@ -12,13 +12,16 @@ export interface UserDTO {
 export interface LoginResponseDTO {
       success: boolean;
       message: string;
-      access_token: string;
       user: UserDTO;
 }
 
 export interface RegisterResponseDTO {
       success: boolean;
       message: string;
+      user: UserDTO;
+}
+
+export interface MeResponseDTO {
       user: UserDTO;
 }
 
