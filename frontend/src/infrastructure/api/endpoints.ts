@@ -36,5 +36,10 @@ export const ENDPOINTS = {
       },
       projects: {
             list: "/projects/",
+            byId: (projectId: number) => `/projects/${projectId}`,
+      },
+      notifications: {
+            list: "/notifications/",
+            byId: (notificationId: number) => `/notifications/${notificationId}`,
       },
 } as const;

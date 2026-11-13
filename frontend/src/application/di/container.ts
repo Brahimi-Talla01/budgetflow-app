@@ -2,10 +2,12 @@ import { apiClient } from "../../infrastructure/api/apiClient";
 import { HttpAuthRepository } from "../../infrastructure/repositories/HttpAuthRepository";
 import { HttpExpenseRepository } from "../../infrastructure/repositories/HttpExpenseRepository";
 import { HttpIncomeRepository } from "../../infrastructure/repositories/HttpIncomeRepository";
+import { HttpNotificationRepository } from "../../infrastructure/repositories/HttpNotificationRepository";
 import { HttpProjectRepository } from "../../infrastructure/repositories/HttpProjectRepository";
 import type { IAuthRepository } from "../../domain/repositories/IAuthRepository";
 import type { IExpenseRepository } from "../../domain/repositories/IExpenseRepository";
 import type { IIncomeRepository } from "../../domain/repositories/IIncomeRepository";
+import type { INotificationRepository } from "../../domain/repositories/INotificationRepository";
 import type { IProjectRepository } from "../../domain/repositories/IProjectRepository";
 
 export interface RepositoryContainer {
@@ -13,6 +15,7 @@ export interface RepositoryContainer {
       expenses: IExpenseRepository;
       incomes: IIncomeRepository;
       projects: IProjectRepository;
+      notifications: INotificationRepository;
 }
 
 /**
@@ -24,4 +27,5 @@ export const repositories: RepositoryContainer = {
       expenses: new HttpExpenseRepository(apiClient),
       incomes: new HttpIncomeRepository(apiClient),
       projects: new HttpProjectRepository(apiClient),
+      notifications: new HttpNotificationRepository(apiClient),
 };

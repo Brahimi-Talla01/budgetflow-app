@@ -16,6 +16,7 @@ import { AuthProvider } from "./application/context/AuthProvider"
 import { ExpenseProvider } from "./application/context/ExpenseProvider"
 import { IncomeProvider } from "./application/context/IncomeProvider"
 import { ProjectProvider } from "./application/context/ProjectProvider"
+import { NotificationProvider } from "./application/context/NotificationProvider"
 
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         <IncomeProvider>
           <ProjectProvider>
 
+          <NotificationProvider>
           <LoadingProvider>
             <Routes>
 
@@ -49,6 +51,7 @@ const App = () => {
 
             </Routes>
           </LoadingProvider>
+          </NotificationProvider>
 
           </ProjectProvider>
         </IncomeProvider>

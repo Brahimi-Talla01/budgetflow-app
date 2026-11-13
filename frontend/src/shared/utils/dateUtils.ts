@@ -11,6 +11,25 @@ export const PERIOD_OPTIONS: ReadonlyArray<{ value: PeriodValue; label: string }
 export const formatDate = (date: Date): string =>
       date.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
 
+/** Format lisible pour une notification : « il y a 5 min », « il y a 2 j », sinon la date. */
+export const formatRelativeTime = (date: Date, now: Date = new Date()): string => {
+      const diffInMs = now.getTime() - date.getTime();
+
+      if (Number.isNaN(diffInMs) || diffInMs < 0) return formatDate(date);
+
+      const minutes = Math.floor(diffInMs / 60_000);
+      if (minutes < 1) return "à l'instant";
+      if (minutes < 60) return `il y a ${minutes} min`;
+
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `il y a ${hours} h`;
+
+      const days = Math.floor(hours / 24);
+      if (days < 7) return `il y a ${days} j`;
+
+      return formatDate(date);
+};
+
 export const isDateInPeriod = (date: Date, period: PeriodValue, now: Date = new Date()): boolean => {
       if (Number.isNaN(date.getTime())) return false;
 

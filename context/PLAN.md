@@ -93,8 +93,7 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | Catégories codées en dur | listes dans le composant | idem |
 
 > Les trois lignes ci-dessus sont traitées par le lot 1 (voir § 4).
-| Pages vides | `Analyse`, `Conseil`, `Projets`, `Transaction` = 13 à 16 lignes de placeholder | `pages/*` |
-| Composants vides | `ExpenseCard`, `ExpenseForm`, `ExpenseList`, `ProtectedRoute` (doublon de `routes/PrivateRoute.tsx`) | `components/expenses/*` |
+| Composants vides | `ExpenseCard`, `ExpenseForm`, `ExpenseList`, `ProtectedRoute` (doublon de `routes/PrivateRoute.tsx`) — à supprimer ou implémenter | `components/expenses/*` |
 | Couches inutilisées | interfaces notification/projet, use-cases, `DIContext.tsx` vides | `domain/`, `application/` |
 | TanStack Query inutilisé | dépendance installée mais aucun `QueryClient` | `main.tsx` |
 | Session | token en `localStorage`, pas de refresh token | `infrastructure/storage/` |
@@ -132,10 +131,10 @@ graphique sans rechargement, et une erreur API s'affiche dans l'UI.
 ### Lot 2 — Pages réelles
 
 - [x] `TransactionPage` : liste complète dépenses + revenus, filtres par type/période/catégorie + recherche
-- [ ] `ProjectsPage` : CRUD projets, rattachement d'une transaction à un projet
-- [ ] `AnalysePage` : agrégats par catégorie et évolution mensuelle
-- [ ] `ConseilPage` : contenu statique utile ou retrait de la route
-- [ ] Notifications : brancher `notifications` (contexte ou TanStack Query) sur le backend
+- [x] `ProjectsPage` : CRUD projets, rattachement d'une transaction à un projet
+- [x] `AnalysePage` : agrégats par catégorie et évolution mensuelle
+- [x] `ConseilPage` : conseils statiques + diagnostic contextuel du solde
+- [x] Notifications : contexte branché sur `GET/PATCH /notifications`, badge de non-lues et marquage à la lecture
 
 Critère d'acceptation : aucune page ne contient de placeholder ni de `console.log`.
 
