@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ButtonProps {
   children: React.ReactNode;
-  onClick?: (event: React.MouseEvent<HTMLButtonElement> | any) => void | Promise<void>;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>;
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'success' | 'warning';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;

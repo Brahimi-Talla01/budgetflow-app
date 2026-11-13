@@ -1,38 +1,28 @@
-import { useState } from "react";
-import axios from "axios";
+import { useCallback, useState } from "react";
+import { repositories } from "../../application/di/container";
+import type { AuthSession, LoginCredentials } from "../../domain/repositories/IAuthRepository";
+import { getErrorMessage } from "../../shared/utils/errors";
+
+export type LoginResult = ({ success: true } & AuthSession) | { success: false; message: string };
 
 export const useLogin = () => {
-  const [loading, setLoading] = useState(false);
+      const [loading, setLoading] = useState(false);
 
-  const execute = async (data: { email: string; password: string }) => {
-    setLoading(true);
+      const execute = useCallback(async (credentials: LoginCredentials): Promise<LoginResult> => {
+            setLoading(true);
 
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
-        data
-      );
+            try {
+                  const session = await repositories.auth.login(credentials);
+                  return { success: true, ...session };
+            } catch (error) {
+                  return {
+                        success: false,
+                        message: getErrorMessage(error, "Email ou mot de passe incorrect."),
+                  };
+            } finally {
+                  setLoading(false);
+            }
+      }, []);
 
-      setLoading(false);
-
-      return {
-        success: true,
-        message: res.data.message,
-        token: res.data.access_token,
-        user: res.data.user,
-      };
-    } catch (error: any) {
-      setLoading(false);
-
-      return {
-        success: false,
-        message:
-          error?.response?.data?.message ||
-          error?.response?.data?.errors ||
-          "Email ou mot de passe incorrect.",
-      };
-    }
-  };
-
-  return { execute, loading };
+      return { execute, loading };
 };

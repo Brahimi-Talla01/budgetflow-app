@@ -3,7 +3,7 @@ import { Check } from 'lucide-react';
 import { cn } from '../../../shared/utils/cn';
 import type { PricingPlan } from './Prices';
 import { Button } from '../ui/Button';
-import { useAuth } from '../../../application/context/AuthContext';
+import { useAuth } from '../../../application/context/authContext';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
 
 

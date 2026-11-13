@@ -4,5 +4,7 @@ Flask-Migrate==4.0.5
 SQLAlchemy==2.0.21
 psycopg2-binary
 flask_bcrypt==1.0.1
+Flask-Cors==6.0.1
+marshmallow==4.1.0
 flask_sqlalchemy
 dotenv

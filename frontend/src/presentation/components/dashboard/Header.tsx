@@ -2,13 +2,12 @@ import { Activity } from 'react';
 import { Button } from '../ui/Button';
 import { Download, Plus } from 'lucide-react';
 import TransactionModal from '../transaction/TransactionModal';
-import type { ExpenseFormProps } from '../../../domain/entities/Expense';
-import type { TransactionType } from '../../pages/dashboard/DashboardPage';
+import type { TransactionPayload } from '../../../domain/entities/Expense';
 
 interface HeaderProps {
       isModalOpen: boolean;
       setIsModalOpen: (open: boolean) => void;
-      onSubmit: (data: ExpenseFormProps, type: TransactionType) => void;
+      onSubmit: (data: TransactionPayload) => void;
 }
 
 

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import type { CreateExpenseProps, ExpenseFormProps } from '../../domain/entities/Expense';
 
 type FormErrors = Partial<Record<keyof ExpenseFormProps, string>>;
@@ -23,8 +23,8 @@ export const useFormValidation = (initialData: Partial<ExpenseFormProps> = {}) =
 
     // 2. Mise à jour générique de n'importe quel champ
     const handleChange = useCallback((
-        name: keyof ExpenseFormProps, 
-        value: any
+        name: keyof ExpenseFormProps,
+        value: ExpenseFormProps[keyof ExpenseFormProps]
     ) => {
         setFormData(prev => ({
             ...prev,
@@ -69,14 +69,16 @@ export const useFormValidation = (initialData: Partial<ExpenseFormProps> = {}) =
         return Object.keys(newErrors).length === 0;
     }, [formData]);
 
-    // 4. Préparation des données pour la soumission
-    const getSubmitData = useMemo((): Omit<CreateExpenseProps, 'userId'> | null => {
+    // 4. Préparation des données pour la soumission.
+    // La validation est déclenchée à l'appel (et non pendant le rendu via useMemo) :
+    // cela évite un setState en phase de rendu, qui pouvait boucler à l'infini.
+    const getSubmitData = useCallback((): Omit<CreateExpenseProps, 'userId'> | null => {
         if (!validateForm()) {
-            return null; 
+            return null;
         }
 
         const numericAmount = parseFloat(formData.amount);
-        
+
         const projectId = formData.hasProject && formData.projectId ? formData.projectId : undefined;
 
         return {

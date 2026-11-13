@@ -1,5 +1,5 @@
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
-import { useAuth } from '../../../application/context/AuthContext';
+import { useAuth } from '../../../application/context/authContext';
 import { Button } from '../ui/Button';
 
 

@@ -1,15 +1,14 @@
 import { useCallback, useMemo, useState } from "react";
 import { useFormValidation } from "../../../application/hooks/useFormValidation";
 import { AlertCircle, Briefcase, Calendar, DollarSign, FileText, Tag, TrendingDown, TrendingUp, X } from "lucide-react";
-import { useExpenses } from "../../../application/context/ExpenseContext";
+import { useExpenses } from "../../../application/context/expenseContext";
+import type { TransactionPayload, TransactionType } from "../../../domain/entities/Expense";
 import { Button } from "../ui/Button";
-
-type TransactionType = 'expense' | 'income';
 
 interface TransactionModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: any, type: TransactionType) => void;
+    onSubmit: (data: TransactionPayload) => void;
 }
 
 const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -43,25 +42,26 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
     const handleSubmit = useCallback((e: React.FormEvent) => {
         e.preventDefault();
         
-        if (validateForm()) {
-            
-            const submitData = {
-                amount: parseFloat(formData.amount),
-                category: formData.category,
-                description: formData.description || undefined,
-                date: formData.date.toISOString().split('T')[0], 
-                projectId: formData.hasProject && formData.projectId ? formData.projectId : undefined,
-                type: transactionType,
-            };
+        if (!validateForm() || loading) return;
 
-            onSubmit(submitData, transactionType);
-            
-            !loading && handleClose();
-        }
-    }, [formData, validateForm, transactionType, onSubmit, handleClose]);
+        const submitData: TransactionPayload = {
+            amount: parseFloat(formData.amount),
+            category: formData.category,
+            description: formData.description || undefined,
+            date: formData.date.toISOString().split('T')[0],
+            projectId: formData.hasProject && formData.projectId ? formData.projectId : undefined,
+            type: transactionType,
+        };
 
+        onSubmit(submitData);
+        handleClose();
+    }, [formData, validateForm, transactionType, onSubmit, handleClose, loading]);
+
+    // Un champ date vidé renvoie une Date invalide : ne pas appeler toISOString dessus.
     const dateInputString = useMemo(() => {
-        return formData.date.toISOString().split('T')[0];
+        return Number.isNaN(formData.date.getTime())
+            ? ''
+            : formData.date.toISOString().split('T')[0];
     }, [formData.date]);
 
     if (!isOpen) return null;
@@ -228,7 +228,10 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                                     type="date"
                                     value={dateInputString}
                                     // Mise à jour du Hook avec un objet Date
-                                    onChange={(e) => handleChange('date', new Date(e.target.value))} 
+                                    onChange={(e) => {
+                                        const nextDate = new Date(e.target.value);
+                                        handleChange('date', Number.isNaN(nextDate.getTime()) ? formData.date : nextDate);
+                                    }}
                                     className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:border-primary focus:ring-primary-flow bg-white text-gray-900 transition-all"
                                 />
                             </div>

@@ -1,16 +1,15 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BudgetflowBranding from "../../components/auth/BudgetflowBranding"; 
-import { AlertCircle, Lock } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import LoginForm, { type LoginFormDataType } from "../../components/auth/LoginForm"; 
 import SecurityBadges from "../../components/auth/SecurityBadges"; 
 import { useLogin } from "../../hooks/useLogin";
-import { useAuth } from "../../../application/context/AuthContext";
+import { useAuth } from "../../../application/context/authContext";
 import PageTitle from "../../components/ui/PageTitle";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [isLocked, setIsLocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const { execute: doLogin, loading } = useLogin();
@@ -24,16 +23,13 @@ const LoginPage = () => {
       password: data.password,
     });
 
-    console.log(res);
-    
-
     if (res.success) {
       login(res.user, res.token);
       navigate("/dashboard");
     } else {
       setError(res.message);
     }
-  }, [doLogin, navigate]);
+  }, [doLogin, login, navigate]);
 
 
   const handleForgotPassword = useCallback(() => {
@@ -56,26 +52,12 @@ const LoginPage = () => {
             </h1>
 
             {/* Messages d'erreur */}
-            {(error || isLocked) && (
-              <div className="mt-6">
-                  {error && (
-                      <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4">
-                        <div className="flex items-center space-x-2">
-                          <AlertCircle className="w-5 h-5 shrink-0" />
-                          <p className="text-sm font-medium">{error}</p>
-                        </div>
-                      </div>
-                  )}
-                  {isLocked && (
-                      <div className="p-4 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg">
-                        <div className="flex items-center space-x-2">
-                          <Lock className="w-5 h-5 shrink-0" />
-                          <p className="text-sm font-medium">
-                            Compte temporairement verrouillé (10s restantes)
-                          </p>
-                        </div>
-                      </div>
-                  )}
+            {error && (
+              <div className="mt-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg mb-4">
+                <div className="flex items-center space-x-2">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <p className="text-sm font-medium">{error}</p>
+                </div>
               </div>
             )}
 

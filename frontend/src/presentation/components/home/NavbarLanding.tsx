@@ -1,10 +1,10 @@
 import { Link, useNavigate, type NavigateFunction } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import logo from '../../../assets/Icon-512.png';
-import { ChevronDown, Kanban, X } from 'lucide-react'; 
+import { Kanban, X } from 'lucide-react'; 
 import { useState } from 'react'; 
-import { useAuth } from '../../../application/context/AuthContext';
-import { assets } from '../../../assets/asset';
+import { useAuth } from '../../../application/context/authContext';
+import { getDisplayName } from '../../../domain/entities/User';
 import UserProfile from '../layout/UserProfile';
 import image from '../../../assets/enfant.jpeg'; 
 
@@ -61,23 +61,10 @@ const NavbarLanding = () => {
                 {/* Boutons d'action */}
                 <div className='hidden md:flex items-center gap-3'>
                     {user ? (
-                        // <div className='flex items-center gap-4'>
-                        //     <div className='flex items-center gap-3 cursor-pointer'>
-                        //         <div className='w-10 h-10 rounded-full overflow-hidden border border-gray-200'>
-                        //             <img src={assets.user} alt="Profile" className='w-full h-full object-cover' />
-                        //         </div>
-                        //         <div className='text-left hidden md:block'>
-                        //             <div className='flex items-center gap-2'>
-                        //                 <p className='text-sm font-semibold text-dark'>{`${user.firstname} ${user.lastname}`}</p>
-                        //                 <ChevronDown className='w-4 h-4 text-dark' />
-                        //             </div>
-                        //         </div>
-                        //     </div>
-                        // </div>
                         <UserProfile
-                                name={`${user?.firstname} ${user?.lastname}`}
+                                name={getDisplayName(user)}
                                 level="Niveau Standard"
-                                image={user?.profileImage || image}
+                                image={image}
                         />
                     ) : (
                         <Button onClick={() => navigate('/login')} variant='ghost' className='text-sm font-medium hover:bg-gray-100'>

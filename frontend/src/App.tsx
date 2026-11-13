@@ -8,13 +8,13 @@ import AnalysePage from "./presentation/pages/analyse/AnalysePage"
 import ConseilPage from "./presentation/pages/conseil/ConseilPage"
 import NotFound from "./presentation/pages/NotFound"
 import LoginPage from "./presentation/pages/auth/LoginPage"
-import { LoadingProvider } from "./application/context/LoadingContext"
+import { LoadingProvider } from "./application/context/LoadingProvider"
 import RegisterPage from "./presentation/pages/auth/RegisterPage"
 import ForgetPasswordPage from "./presentation/pages/auth/ForgetPasswordPage"
 import PrivateRoute from "./routes/PrivateRoute"
-import { AuthProvider } from "./application/context/AuthContext"
-import { ExpenseProvider } from "./application/context/ExpenseContext"
-import { IncomeProvider } from "./application/context/IncomeContext"
+import { AuthProvider } from "./application/context/AuthProvider"
+import { ExpenseProvider } from "./application/context/ExpenseProvider"
+import { IncomeProvider } from "./application/context/IncomeProvider"
 
 
 const App = () => {

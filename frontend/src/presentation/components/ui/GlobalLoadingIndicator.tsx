@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLoading } from '../../../application/context/LoadingContext';
+import { useLoading } from '../../../application/context/loadingContext';
 
 
 const GlobalLoadingIndicator: React.FC = () => {

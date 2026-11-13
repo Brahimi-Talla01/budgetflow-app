@@ -26,8 +26,8 @@ const RegisterPage = () => {
       }
 
       setError(res.message || "Une erreur est survenue.");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Erreur lors de l'inscription.");
+    } catch {
+      setError("Erreur lors de l'inscription.");
     }
   }, [doRegister, navigate]);
 

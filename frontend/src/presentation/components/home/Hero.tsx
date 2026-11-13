@@ -3,7 +3,7 @@ import groupeProfile from '../../../assets/group_profile.png';
 import expense from '../../../assets/expense.png'; 
 import { ArrowRight, TrendingUp, ShieldCheck } from 'lucide-react'; 
 import { useNavigate, type NavigateFunction } from "react-router-dom";
-import { useAuth } from "../../../application/context/AuthContext";
+import { useAuth } from "../../../application/context/authContext";
 
 const Hero = () => {
 
