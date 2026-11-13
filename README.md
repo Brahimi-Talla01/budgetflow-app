@@ -54,6 +54,27 @@ npm run dev                        # http://localhost:5173
 La CI GitHub Actions (`.github/workflows/ci.yml`) vérifie le lint, les tests, le build
 et le démarrage de l'API sur chaque pull request vers `develop` et `main`.
 
+Conteneurisation : `Dockerfile`, `docker-compose.yml`, `.env.example`.
+
+## Lancer avec Docker
+
+Un seul conteneur sert le frontend et l'API (nginx + gunicorn), avec PostgreSQL à côté.
+
+```bash
+cp .env.example .env                  # renseigner JWT_SECRET_KEY et POSTGRES_PASSWORD
+docker compose up -d --build          # http://localhost:8080
+```
+
+Pour reprendre les données d'une base PostgreSQL existante :
+
+```bash
+./scripts/import-db.sh
+docker compose up -d app
+```
+
+Détails, variables d'environnement et réinitialisation de mot de passe :
+[`context/DEPLOYMENT.md`](context/DEPLOYMENT.md).
+
 ## Documentation
 
 - Conventions de code, architecture et règles Git : [`AGENTS.md`](AGENTS.md)
