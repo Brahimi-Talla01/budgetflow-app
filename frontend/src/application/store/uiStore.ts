@@ -1,1 +1,0 @@
-// Zustand (pour état UI global: Sidebar open, Modal, etc.)

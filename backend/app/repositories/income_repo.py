@@ -1,6 +1,7 @@
 from app.extensions import db
 from app.models.income import IncomeModel
 
+
 class IncomeRepository:
 
     @staticmethod

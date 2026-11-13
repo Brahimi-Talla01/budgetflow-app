@@ -1,5 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
 from flask_jwt_extended import create_access_token
+
 from app.models.user import UserModel
 from app.repositories.user_repo import UserRepository
 
@@ -37,7 +39,7 @@ class AuthService:
             return None, None, "Mot de passe incorrect."
 
         # Mise à jour du lastLogin
-        user.lastLogin = datetime.utcnow()
+        user.lastLogin = datetime.now(timezone.utc)
         UserRepository.update_user()
 
         # Générer token
@@ -47,4 +49,4 @@ class AuthService:
         )
 
         return access_token, user, None
-    
+

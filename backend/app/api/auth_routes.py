@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify
-from app.services.auth_service import AuthService
+from flask import Blueprint, jsonify, request
+
 from app.schemas.user_shema import UserCreateSchema, UserLoginSchema, UserResponseSchema
+from app.services.auth_service import AuthService
 
 auth_bp = Blueprint("auth_bp", __name__)
 

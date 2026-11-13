@@ -1,5 +1,6 @@
-from app.repositories.notification_repo import NotificationRepository
 from app.models.notification import NotificationModel
+from app.repositories.notification_repo import NotificationRepository
+
 
 class NotificationService:
 

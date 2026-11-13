@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 class IncomeCreateSchema(Schema):
     amount = fields.Float(required=True)
     source = fields.String(required=True, validate=validate.Length(min=2))

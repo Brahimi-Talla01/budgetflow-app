@@ -70,6 +70,14 @@ Les deux checks sont obligatoires. Il n'y a **aucun test automatisé** pour l'in
 Workflow GitHub Actions + remplacement de `react-helmet-async` (incompatible React 19)
 par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux dépendances backend.
 
+### Lots 1 à 3 — fonctionnel et qualité
+- Création de revenus et projets réels depuis le format modal, solde net sur le dashboard.
+- Page Transactions filtrable, pages Projets (CRUD + progression), Analyse, Conseils et notifications réelles.
+- Tests : Vitest + Testing Library côté frontend, pytest côté backend, ruff pour le lint Python,
+  les deux suites étant exécutées par la CI.
+- Bugs backend corrigés au passage : dates JSON converties avant insertion, identité JWT
+  castée en entier (la modification et la suppression d'une dépense renvoyaient 404).
+
 ### État des vérifications
 
 | Commande | Résultat |
@@ -77,6 +85,9 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | `cd frontend && npm ci` | OK |
 | `cd frontend && npm run lint` | 0 erreur, 0 avertissement |
 | `cd frontend && npm run build` | OK (avertissement de taille de chunk) |
+| `cd frontend && npm test` | 36 tests, OK |
+| `cd backend && ruff check app tests` | OK |
+| `cd backend && pytest -q` | 18 tests, OK |
 | `cd backend && python -m compileall -q app` | OK |
 | Chargement de `create_app()` | OK |
 
@@ -103,7 +114,7 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 
 | Sujet | Détail |
 | --- | --- |
-| Aucun test | ni `pytest`, ni fixtures, ni base de test |
+| Couverture partielle | tests des routes et utilitaires, pas encore de tests des services de notification ni du client HTTP (MSW) |
 | CORS ouvert | `cors.init_app(app)` sans restriction d'origine |
 | Clé JWT par défaut | `default-dev-key` si `JWT_SECRET_KEY` absent |
 | Gestion d'erreurs | pas de handler global, réponses hétérogènes (`errors` / `message`) |
@@ -140,11 +151,11 @@ Critère d'acceptation : aucune page ne contient de placeholder ni de `console.l
 
 ### Lot 3 — Qualité et tests
 
-- [ ] Frontend : Vitest + Testing Library, tests des mappers, du client API (MSW) et du flux de connexion
-- [ ] Backend : `pytest` + `pytest-flask`, base SQLite en mémoire, tests des services et des routes auth/dépenses
-- [ ] CI : ajouter `npm test` et `pytest`, rendre ces étapes bloquantes
-- [ ] Backend : `ruff` (lint + format) dans la CI, typage progressif
-- [ ] Supprimer les fichiers vides non utilisés (use-cases, `DIContext.tsx`, `ProtectedRoute.tsx`)
+- [x] Frontend : Vitest + Testing Library, tests des mappers, des utilitaires et des composants de transactions
+- [x] Backend : `pytest`, base SQLite temporaire, tests des routes auth / dépenses / projets / notifications
+- [x] CI : `npm test` et `pytest` exécutés et bloquants
+- [x] Backend : `ruff` dans la CI
+- [x] Supprimer les fichiers vides non utilisés (use-cases, `DIContext.tsx`, `ProtectedRoute.tsx`)
 
 Critère d'acceptation : la CI exécute les tests et échoue si la couverture des services
 backend ou du client API régresse.

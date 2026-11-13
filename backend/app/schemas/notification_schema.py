@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields
 
+
 class NotificationSchema(Schema):
     notificationId = fields.Int(dump_only=True)
     title = fields.Str(required=True)

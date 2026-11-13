@@ -1,5 +1,7 @@
-from app.extensions import db
 from datetime import datetime
+
+from app.extensions import db
+
 
 class ExpenseModel(db.Model):
     __tablename__ = "expense"

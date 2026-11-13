@@ -1,5 +1,7 @@
-from app.extensions import db
 from datetime import datetime
+
+from app.extensions import db
+
 
 class NotificationModel(db.Model):
     __tablename__ = "notification"

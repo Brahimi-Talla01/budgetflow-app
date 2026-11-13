@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields
 
+
 class ProjectCreateSchema(Schema):
     name = fields.Str(required=True)
     targetAmount = fields.Float(required=True)

@@ -1,6 +1,7 @@
 from app.extensions import db
 from app.models.user import UserModel
 
+
 class UserRepository:
 
     @staticmethod
