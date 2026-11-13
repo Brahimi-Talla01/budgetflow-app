@@ -33,6 +33,7 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
             mutationFn: (payload: CreateExpenseDTO) => repositories.expenses.create(payload),
             onSuccess: () => {
                   void queryClient.invalidateQueries({ queryKey: queryKeys.expenses });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.transactionsRoot });
                   invalidateNotifications();
             },
       });
@@ -42,6 +43,7 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
                   repositories.expenses.update(id, payload),
             onSuccess: () => {
                   void queryClient.invalidateQueries({ queryKey: queryKeys.expenses });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.transactionsRoot });
             },
       });
 
@@ -49,6 +51,7 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
             mutationFn: (id: number) => repositories.expenses.remove(id),
             onSuccess: () => {
                   void queryClient.invalidateQueries({ queryKey: queryKeys.expenses });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.transactionsRoot });
             },
       });
 

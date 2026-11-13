@@ -6,9 +6,10 @@ import type { TransactionRow } from "./types";
 interface TransactionListProps {
       rows: TransactionRow[];
       emptyMessage: string;
+      onSelect?: (row: TransactionRow) => void;
 }
 
-const TransactionList = ({ rows, emptyMessage }: TransactionListProps) => {
+const TransactionList = ({ rows, emptyMessage, onSelect }: TransactionListProps) => {
       if (rows.length === 0) {
             return (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -26,8 +27,8 @@ const TransactionList = ({ rows, emptyMessage }: TransactionListProps) => {
                         const isIncome = row.type === "income";
                         const Icon = isIncome ? ArrowUpRight : ArrowDownRight;
 
-                        return (
-                              <li key={row.key} className="flex items-center gap-3 py-3">
+                        const content = (
+                              <>
                                     <span
                                           className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center ${
                                                 isIncome
@@ -53,6 +54,23 @@ const TransactionList = ({ rows, emptyMessage }: TransactionListProps) => {
                                     >
                                           {formatSignedXAF(row.amount, isIncome ? "in" : "out")}
                                     </span>
+                              </>
+                        );
+
+                        return (
+                              <li key={row.key}>
+                                    {onSelect ? (
+                                          <button
+                                                type="button"
+                                                onClick={() => onSelect(row)}
+                                                aria-label={`Voir le détail de ${row.label}`}
+                                                className="w-full flex items-center gap-3 py-3 text-left px-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                                          >
+                                                {content}
+                                          </button>
+                                    ) : (
+                                          <div className="flex items-center gap-3 py-3">{content}</div>
+                                    )}
                               </li>
                         );
                   })}

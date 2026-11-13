@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import PageTitle from "../../components/ui/PageTitle";
 import AlertBanner from "../../components/ui/AlertBanner";
@@ -24,6 +25,7 @@ const EMPTY_PAGINATION: PaginationMeta = {
 };
 
 const TransactionPage = () => {
+      const navigate = useNavigate();
       const [search, setSearch] = useState("");
       const [typeFilter, setTypeFilter] = useState<TransactionTypeFilter>("all");
       const [period, setPeriod] = useState<PeriodValue>("all");
@@ -142,6 +144,9 @@ const TransactionPage = () => {
                         ) : (
                               <TransactionList
                                     rows={rows}
+                                    onSelect={(row) =>
+                                          navigate(`/dashboard/transaction/${row.type}/${row.id}`)
+                                    }
                                     emptyMessage={
                                           hasFilters
                                                 ? "Aucune transaction ne correspond à ces filtres."

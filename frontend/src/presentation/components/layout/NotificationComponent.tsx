@@ -1,4 +1,5 @@
-import { Bell, CheckCircle2 } from "lucide-react";
+import { Bell, CheckCircle2, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { useNotifications } from "../../../application/context/notificationContext";
 import { formatRelativeTime } from "../../../shared/utils/dateUtils";
@@ -9,6 +10,16 @@ interface NotificationComponentProps {
 
 const NotificationComponent: React.FC<NotificationComponentProps> = ({ setIsNotificationOpen }) => {
       const { notifications, unreadCount, loading, markAsRead } = useNotifications();
+      const navigate = useNavigate();
+
+      const handleOpen = (notification: (typeof notifications)[number]) => {
+            if (!notification.isRead) {
+                  void markAsRead(notification.id);
+            }
+
+            setIsNotificationOpen(false);
+            navigate(notification.link ?? "/dashboard");
+      };
 
       return (
             <>
@@ -48,7 +59,7 @@ const NotificationComponent: React.FC<NotificationComponentProps> = ({ setIsNoti
                                     <button
                                           key={notification.id}
                                           type="button"
-                                          onClick={() => void markAsRead(notification.id)}
+                                          onClick={() => handleOpen(notification)}
                                           className={`w-full text-left p-4 border-b border-gray-100 last:border-b-0 transition-colors cursor-pointer ${
                                                 notification.isRead ? "bg-white hover:bg-gray-50" : "bg-primary-flow/40 hover:bg-primary-flow/60"
                                           }`}
@@ -82,6 +93,8 @@ const NotificationComponent: React.FC<NotificationComponentProps> = ({ setIsNoti
                                                             {notification.message}
                                                       </p>
                                                 </div>
+
+                                                <ChevronRight className="w-4 h-4 text-gray-300 shrink-0 self-center" />
                                           </div>
                                     </button>
                               ))}

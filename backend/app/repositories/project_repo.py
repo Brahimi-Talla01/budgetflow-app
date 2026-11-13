@@ -37,6 +37,13 @@ class ProjectRepository:
 
     @staticmethod
     def delete_project(project):
+        # Les transactions liées survivent au projet : on les détache d'abord.
+        ExpenseModel.query.filter_by(projectId=project.projectId).update(
+            {"projectId": None}, synchronize_session=False
+        )
+        IncomeModel.query.filter_by(projectId=project.projectId).update(
+            {"projectId": None}, synchronize_session=False
+        )
         db.session.delete(project)
         db.session.commit()
 

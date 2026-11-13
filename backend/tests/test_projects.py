@@ -47,6 +47,33 @@ def test_delete_project(client, auth_headers):
     assert client.get("/api/v1/projects/", headers=auth_headers).get_json() == []
 
 
+def test_deleting_project_keeps_linked_transactions(client, auth_headers):
+    project = client.post(
+        "/api/v1/projects/", json=PROJECT_PAYLOAD, headers=auth_headers
+    ).get_json()
+
+    expense = client.post(
+        "/api/v1/expenses/",
+        json={
+            "amount": 1500,
+            "category": "Transport",
+            "date": "2026-01-10",
+            "projectId": project["projectId"],
+        },
+        headers=auth_headers,
+    ).get_json()["expense"]
+
+    response = client.delete(
+        f"/api/v1/projects/{project['projectId']}", headers=auth_headers
+    )
+    assert response.status_code == 200
+
+    remaining = client.get(
+        f"/api/v1/expenses/{expense['expenseId']}", headers=auth_headers
+    ).get_json()
+    assert remaining["projectId"] is None
+
+
 def test_project_stats_returns_progress(client, auth_headers):
     project = client.post(
         "/api/v1/projects/", json=PROJECT_PAYLOAD, headers=auth_headers
