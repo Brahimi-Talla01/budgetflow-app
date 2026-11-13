@@ -54,7 +54,7 @@ const AppPreview = () => {
                         
                         <video
                             ref={videoRef}
-                            src={assets.budgetflow_video}
+                            src={assets.budgetflowVideo}
                             poster={assets.budgetflow}
                             className="w-full h-full object-cover"
                             autoPlay

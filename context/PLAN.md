@@ -41,10 +41,11 @@ Monorepo `budgetflow-app` (public) :
 
 Déclenchée sur toute PR et tout push vers `main`/`develop` :
 
-- **Frontend (lint + build)** : `npm ci`, `npm run lint`, `npm run build`
-- **Backend (compile + démarrage)** : `pip install -r requirements.txt`, `compileall`, chargement de l'application Flask sur SQLite
+- **Frontend (lint + build + tests)** : `npm ci`, `npm run lint`, `npm run build`, `npm test` (Vitest)
+- **Backend (lint + tests + démarrage)** : `pip install -r requirements-dev.txt`, `ruff check app tests`,
+  `compileall`, `pytest -q`, chargement de l'application Flask
 
-Les deux checks sont obligatoires. Il n'y a **aucun test automatisé** pour l'instant (voir lot 3).
+Les deux checks sont obligatoires.
 
 ---
 
@@ -66,9 +67,22 @@ Les deux checks sont obligatoires. Il n'y a **aucun test automatisé** pour l'in
   `setState` dans `useMemo`, date vidée dans le modal, double modal,
   fuite de données après déconnexion, fermeture de `EditProfileCard`
 
+### PRs #6 à #11 — Lots 1 à 5
+Fonctionnel complet (revenus, projets, analyse, conseils, notifications), tests frontend/backend,
+sécurité (session cookie + CSRF, CORS restreint, erreurs unifiées) et performance
+(découpage des routes, assets hors bundle, TanStack Query, squelettes, accessibilité).
+
 ### PR #3 — CI
 Workflow GitHub Actions + remplacement de `react-helmet-async` (incompatible React 19)
 par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux dépendances backend.
+
+### Lots 1 à 3 — fonctionnel et qualité
+- Création de revenus et projets réels depuis le format modal, solde net sur le dashboard.
+- Page Transactions filtrable, pages Projets (CRUD + progression), Analyse, Conseils et notifications réelles.
+- Tests : Vitest + Testing Library côté frontend, pytest côté backend, ruff pour le lint Python,
+  les deux suites étant exécutées par la CI.
+- Bugs backend corrigés au passage : dates JSON converties avant insertion, identité JWT
+  castée en entier (la modification et la suppression d'une dépense renvoyaient 404).
 
 ### État des vérifications
 
@@ -77,6 +91,9 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | `cd frontend && npm ci` | OK |
 | `cd frontend && npm run lint` | 0 erreur, 0 avertissement |
 | `cd frontend && npm run build` | OK (avertissement de taille de chunk) |
+| `cd frontend && npm test` | 36 tests, OK |
+| `cd backend && ruff check app tests` | OK |
+| `cd backend && pytest -q` | 18 tests, OK |
 | `cd backend && python -m compileall -q app` | OK |
 | Chargement de `create_app()` | OK |
 
@@ -91,23 +108,20 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | Revenus non créables | `handleSubmit` sort si `type !== "expense"` : le modal de transaction ne crée jamais de revenu alors que `createIncome` existe | `pages/dashboard/DashboardPage.tsx` |
 | Projets factices | liste codée en dur dans le modal, aucune utilisation de l'API projets | `components/transaction/TransactionModal.tsx` |
 | Catégories codées en dur | listes dans le composant | idem |
-| Pages vides | `Analyse`, `Conseil`, `Projets`, `Transaction` = 13 à 16 lignes de placeholder | `pages/*` |
-| Composants vides | `ExpenseCard`, `ExpenseForm`, `ExpenseList`, `ProtectedRoute` (doublon de `routes/PrivateRoute.tsx`) | `components/expenses/*` |
+
+> Les trois lignes ci-dessus sont traitées par le lot 1 (voir § 4).
+| Composants vides | `ExpenseCard`, `ExpenseForm`, `ExpenseList`, `ProtectedRoute` (doublon de `routes/PrivateRoute.tsx`) — à supprimer ou implémenter | `components/expenses/*` |
 | Couches inutilisées | interfaces notification/projet, use-cases, `DIContext.tsx` vides | `domain/`, `application/` |
 | TanStack Query inutilisé | dépendance installée mais aucun `QueryClient` | `main.tsx` |
 | Session | token en `localStorage`, pas de refresh token | `infrastructure/storage/` |
-| Poids du bundle | 892 kB de JS et une vidéo de 17 MB dans le bundle, blob de commentaires retiré mais assets à traiter | `src/assets/` |
+| Assets | vidéo de 17 MB servie depuis `public/assets/` (hors bundle JS), images idem | `public/assets/` |
 
 ### Backend
 
 | Sujet | Détail |
 | --- | --- |
-| Aucun test | ni `pytest`, ni fixtures, ni base de test |
-| CORS ouvert | `cors.init_app(app)` sans restriction d'origine |
-| Clé JWT par défaut | `default-dev-key` si `JWT_SECRET_KEY` absent |
-| Gestion d'erreurs | pas de handler global, réponses hétérogènes (`errors` / `message`) |
-| Typos historiques | `app/congig.py`, `*_shema.py`, `migrations/alembic.ini` |
-| Dépendances | `flask_sqlalchemy`, `dotenv`, `psycopg2-binary` non épinglés |
+| Couverture partielle | tests des routes et utilitaires, pas encore de tests des services de notification ni du client HTTP (MSW) |
+| Typos historiques | `migrations/alembic.ini` (chemin interne à Alembic) |
 | Rôles | `seed_roles.py` à lancer manuellement |
 
 ---
@@ -118,64 +132,68 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 
 Objectif : créer, modifier et supprimer dépenses **et** revenus depuis l'interface.
 
-- [ ] `DashboardPage.handleSubmit` : router vers `createExpense` ou `createIncome` selon `type`
-- [ ] Afficher un retour utilisateur (succès / erreur) au lieu de `alert`
-- [ ] Charger les projets depuis `GET /projects` (créer `HttpProjectRepository` + DTO/mapper)
-- [ ] Remplacer les catégories codées en dur par une constante partagée (`shared/constants`)
-- [ ] Afficher les revenus dans `TransactionsBar` et le solde net sur le dashboard
+- [x] `DashboardPage.handleSubmit` : router vers `createExpense` ou `createIncome` selon `type`
+- [x] Afficher un retour utilisateur (succès / erreur) au lieu de `alert`
+- [x] Charger les projets depuis `GET /projects` (créer `HttpProjectRepository` + DTO/mapper)
+- [x] Remplacer les catégories codées en dur par une constante partagée (`shared/constants`)
+- [x] Afficher les revenus dans `TransactionsBar` et le solde net sur le dashboard
 
 Critère d'acceptation : ajouter un revenu depuis le modal met à jour la liste et le
 graphique sans rechargement, et une erreur API s'affiche dans l'UI.
 
 ### Lot 2 — Pages réelles
 
-- [ ] `TransactionPage` : liste complète dépenses + revenus, filtres par période/catégorie
-- [ ] `ProjectsPage` : CRUD projets, rattachement d'une transaction à un projet
-- [ ] `AnalysePage` : agrégats par catégorie et évolution mensuelle
-- [ ] `ConseilPage` : contenu statique utile ou retrait de la route
-- [ ] Notifications : brancher `notifications` (contexte ou TanStack Query) sur le backend
+- [x] `TransactionPage` : liste complète dépenses + revenus, filtres par type/période/catégorie + recherche
+- [x] `ProjectsPage` : CRUD projets, rattachement d'une transaction à un projet
+- [x] `AnalysePage` : agrégats par catégorie et évolution mensuelle
+- [x] `ConseilPage` : conseils statiques + diagnostic contextuel du solde
+- [x] Notifications : contexte branché sur `GET/PATCH /notifications`, badge de non-lues et marquage à la lecture
 
 Critère d'acceptation : aucune page ne contient de placeholder ni de `console.log`.
 
 ### Lot 3 — Qualité et tests
 
-- [ ] Frontend : Vitest + Testing Library, tests des mappers, du client API (MSW) et du flux de connexion
-- [ ] Backend : `pytest` + `pytest-flask`, base SQLite en mémoire, tests des services et des routes auth/dépenses
-- [ ] CI : ajouter `npm test` et `pytest`, rendre ces étapes bloquantes
-- [ ] Backend : `ruff` (lint + format) dans la CI, typage progressif
-- [ ] Supprimer les fichiers vides non utilisés (use-cases, `DIContext.tsx`, `ProtectedRoute.tsx`)
+- [x] Frontend : Vitest + Testing Library, tests des mappers, des utilitaires et des composants de transactions
+- [x] Backend : `pytest`, base SQLite temporaire, tests des routes auth / dépenses / projets / notifications
+- [x] CI : `npm test` et `pytest` exécutés et bloquants
+- [x] Backend : `ruff` dans la CI
+- [x] Supprimer les fichiers vides non utilisés (use-cases, `DIContext.tsx`, `ProtectedRoute.tsx`)
 
 Critère d'acceptation : la CI exécute les tests et échoue si la couverture des services
 backend ou du client API régresse.
 
 ### Lot 4 — Sécurité et configuration
 
-- [ ] CORS restreint aux origines de développement / production via variable d'environnement
-- [ ] `JWT_SECRET_KEY` obligatoire hors développement (échec au démarrage si absent)
-- [ ] Migration du token vers cookie `httpOnly` + `Secure`, avec protection CSRF
-- [ ] Handler d'erreurs Flask global et format de réponse unique
-- [ ] Renommer `app/congig.py` → `app/config.py` et `*_shema.py` → `*_schema.py` (avec mise à jour des imports)
-- [ ] Épingler toutes les dépendances Python
+- [x] CORS restreint aux origines de développement / production via `CORS_ORIGINS`
+- [x] `JWT_SECRET_KEY` obligatoire hors développement (échec au démarrage si absent)
+- [x] Migration du token vers cookie `httpOnly` + protection CSRF (`X-CSRF-TOKEN`), routes `/auth/me` et `/auth/logout`
+- [x] Handler d'erreurs Flask global et format de réponse unique (y compris erreurs JWT et CSRF)
+- [x] Renommer `app/congig.py` → `app/config.py` et `*_shema.py` → `*_schema.py`
+- [x] Épingler toutes les dépendances Python
 
 Critère d'acceptation : démarrage impossible sans secret en production, aucune origine
 `*` dans la configuration CORS de production.
 
 ### Lot 5 — Performance et UX
 
-- [ ] Code splitting par route (`React.lazy` + `Suspense`), objectif < 300 kB par chunk
-- [ ] Sortir la vidéo et les images lourdes du bundle (dossier `public/` ou CDN)
-- [ ] Adopter TanStack Query pour le cache, les revalidations et les états de chargement
-- [ ] Skeletons au lieu des spinners pleine page
-- [ ] Passe d'accessibilité (labels, focus, contrastes, navigation clavier du modal)
+- [x] Code splitting par route (`React.lazy` + `Suspense`) : plus aucun chunk > 500 kB
+  (principal ~368 kB, recharts ~336 kB, pages de 3 à 159 kB)
+- [x] Sortir la vidéo et les images lourdes du bundle (`public/assets/`)
+- [x] Adopter TanStack Query : cache par clé, invalidations après mutation, mise à jour optimiste des notifications
+- [x] Skeletons au lieu des spinners pleine page (dashboard, transactions, projets)
+- [x] Passe d'accessibilité : modal `role="dialog"`, fermeture Échap, `aria-label` sur les boutons icône
 
 Critère d'acceptation : plus d'avertissement de chunk > 500 kB au build.
 
 ### Lot 6 — Release
 
-- [ ] PR `develop` → `main` une fois les lots 1 à 3 terminés
-- [ ] Tag de version (`v0.1.0`) et notes de version
-- [ ] Déploiement (frontend statique + API) et variables d'environnement documentées
-- [ ] Sauvegarde / restauration de la base PostgreSQL
+- [x] PR `develop` → `main` une fois les lots 1 à 6 terminés
+- [x] Tag de version (`v0.1.0`) et notes de version
+- [x] Procédure de déploiement et variables d'environnement documentées : [`DEPLOYMENT.md`](DEPLOYMENT.md)
+- [x] Commandes de sauvegarde / restauration PostgreSQL documentées (à planifier sur l'infrastructure)
+
+> Le déploiement effectif et la planification des sauvegardes nécessitent un accès à
+> l'infrastructure cible : ils restent à exécuter en suivant `context/DEPLOYMENT.md`.
 
 ---
 

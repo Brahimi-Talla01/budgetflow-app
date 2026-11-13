@@ -1,6 +1,7 @@
 from app.models.role import RoleModel
 from app.repositories.role_repo import RoleRepository
 
+
 class RoleService:
 
     @staticmethod

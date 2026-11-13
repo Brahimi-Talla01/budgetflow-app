@@ -1,6 +1,7 @@
 from app.extensions import db
 from app.models.notification import NotificationModel
 
+
 class NotificationRepository:
 
     @staticmethod

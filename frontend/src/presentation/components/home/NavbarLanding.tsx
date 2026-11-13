@@ -1,12 +1,11 @@
 import { Link, useNavigate, type NavigateFunction } from 'react-router-dom';
 import { Button } from '../ui/Button';
-import logo from '../../../assets/Icon-512.png';
 import { Kanban, X } from 'lucide-react'; 
 import { useState } from 'react'; 
 import { useAuth } from '../../../application/context/authContext';
+import { assets } from '../../../assets/asset';
 import { getDisplayName } from '../../../domain/entities/User';
 import UserProfile from '../layout/UserProfile';
-import image from '../../../assets/enfant.jpeg'; 
 
 
 const navLinks = [
@@ -41,7 +40,7 @@ const NavbarLanding = () => {
                         onClick={() => setIsMenuOpen(false)}
                 >
                     <div className='w-8 h-8'>
-                        <img src={logo} alt="Logo BudgetFlow" className='w-full h-full object-cover' />
+                        <img src={assets.logo} alt="Logo BudgetFlow" className='w-full h-full object-cover' />
                     </div>
                     <span className='text-xl font-extrabold text-primary'>BudgetFlow</span>
                 </Link>
@@ -64,7 +63,7 @@ const NavbarLanding = () => {
                         <UserProfile
                                 name={getDisplayName(user)}
                                 level="Niveau Standard"
-                                image={image}
+                                image={assets.user}
                         />
                     ) : (
                         <Button onClick={() => navigate('/login')} variant='ghost' className='text-sm font-medium hover:bg-gray-100'>

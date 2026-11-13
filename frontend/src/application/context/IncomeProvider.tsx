@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateIncomeDTO, IncomeProps } from "../../domain/entities/Income";
 import { getErrorMessage } from "../../shared/utils/errors";
+import { queryKeys } from "../../shared/constants/queryKeys";
 import { repositories } from "../di/container";
 import { useAuth } from "./authContext";
 import { IncomeContext } from "./incomeContext";
@@ -14,88 +16,107 @@ const toUpdatePayload = (data: Partial<IncomeProps>) => ({
 });
 
 export const IncomeProvider = ({ children }: { children: ReactNode }) => {
-      const { token } = useAuth();
-      const [incomes, setIncomes] = useState<IncomeProps[]>([]);
-      const [loading, setLoading] = useState(false);
-      const [error, setError] = useState<string | null>(null);
+      const { isAuthenticated } = useAuth();
+      const queryClient = useQueryClient();
+
+      const incomesQuery = useQuery({
+            queryKey: queryKeys.incomes,
+            queryFn: () => repositories.incomes.list(),
+            enabled: isAuthenticated,
+      });
+
+      const createMutation = useMutation({
+            mutationFn: (payload: CreateIncomeDTO) => repositories.incomes.create(payload),
+            onSuccess: () => {
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.incomes });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
+            },
+      });
+
+      const updateMutation = useMutation({
+            mutationFn: ({ id, payload }: { id: number; payload: ReturnType<typeof toUpdatePayload> }) =>
+                  repositories.incomes.update(id, payload),
+            onSuccess: () => {
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.incomes });
+            },
+      });
+
+      const deleteMutation = useMutation({
+            mutationFn: (id: number) => repositories.incomes.remove(id),
+            onSuccess: () => {
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.incomes });
+            },
+      });
 
       const fetchIncomes = useCallback(async () => {
-            if (!token) return;
+            await incomesQuery.refetch();
+      }, [incomesQuery]);
 
-            setLoading(true);
+      const createIncome = useCallback(async (data: CreateIncomeDTO): Promise<boolean> => {
+            if (!isAuthenticated) return false;
+
             try {
-                  const data = await repositories.incomes.list();
-                  setIncomes(data);
-                  setError(null);
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de charger les revenus."));
-            } finally {
-                  setLoading(false);
-            }
-      }, [token]);
-
-      const createIncome = useCallback(async (dto: CreateIncomeDTO): Promise<boolean> => {
-            if (!token) return false;
-
-            setLoading(true);
-            try {
-                  const created = await repositories.incomes.create(dto);
-                  setIncomes((prev) => [...prev, created]);
-                  setError(null);
+                  await createMutation.mutateAsync(data);
                   return true;
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de créer ce revenu."));
+            } catch {
                   return false;
-            } finally {
-                  setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated, createMutation]);
 
       const updateIncome = useCallback(async (id: number, data: Partial<IncomeProps>) => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
-            setLoading(true);
             try {
-                  const updated = await repositories.incomes.update(id, toUpdatePayload(data));
-                  setIncomes((prev) => prev.map((income) => (income.id === id ? updated : income)));
-                  setError(null);
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de modifier ce revenu."));
-            } finally {
-                  setLoading(false);
+                  await updateMutation.mutateAsync({ id, payload: toUpdatePayload(data) });
+            } catch {
+                  // L'erreur est exposée via `error`.
             }
-      }, [token]);
+      }, [isAuthenticated, updateMutation]);
 
       const deleteIncome = useCallback(async (id: number) => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
-            setLoading(true);
             try {
-                  await repositories.incomes.remove(id);
-                  setIncomes((prev) => prev.filter((income) => income.id !== id));
-                  setError(null);
-            } catch (err) {
-                  setError(getErrorMessage(err, "Impossible de supprimer ce revenu."));
-            } finally {
-                  setLoading(false);
+                  await deleteMutation.mutateAsync(id);
+            } catch {
+                  // L'erreur est exposée via `error`.
             }
-      }, [token]);
+      }, [isAuthenticated, deleteMutation]);
 
-      useEffect(() => {
-            void fetchIncomes();
-      }, [fetchIncomes]);
+      const errorSource = incomesQuery.error
+            ?? createMutation.error
+            ?? updateMutation.error
+            ?? deleteMutation.error;
 
       const value = useMemo(
             () => ({
-                  incomes: token ? incomes : [],
-                  loading,
-                  error,
+                  incomes: isAuthenticated ? (incomesQuery.data ?? []) : [],
+                  loading:
+                        incomesQuery.isLoading ||
+                        createMutation.isPending ||
+                        updateMutation.isPending ||
+                        deleteMutation.isPending,
+                  error: errorSource
+                        ? getErrorMessage(errorSource, "Une erreur est survenue avec les revenus.")
+                        : null,
                   fetchIncomes,
                   createIncome,
                   updateIncome,
                   deleteIncome,
             }),
-            [token, incomes, loading, error, fetchIncomes, createIncome, updateIncome, deleteIncome]
+            [
+                  isAuthenticated,
+                  incomesQuery.data,
+                  incomesQuery.isLoading,
+                  createMutation.isPending,
+                  updateMutation.isPending,
+                  deleteMutation.isPending,
+                  errorSource,
+                  fetchIncomes,
+                  createIncome,
+                  updateIncome,
+                  deleteIncome,
+            ]
       );
 
       return <IncomeContext.Provider value={value}>{children}</IncomeContext.Provider>;

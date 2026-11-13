@@ -1,8 +1,10 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from app.schemas.project_schema import (
-    ProjectCreateSchema, ProjectUpdateSchema, ProjectResponseSchema
+    ProjectCreateSchema,
+    ProjectResponseSchema,
+    ProjectUpdateSchema,
 )
 from app.services.project_service import ProjectService
 

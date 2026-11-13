@@ -1,10 +1,24 @@
 import axios, { AxiosError, type AxiosInstance } from "axios";
-import { NetworkError, UnauthorizedError, ValidationError, DomainError } from "../../domain/errors/DomainErrors";
-import { tokenStorage } from "../storage/TokenStorageService";
+import {
+      DomainError,
+      NetworkError,
+      UnauthorizedError,
+      ValidationError,
+} from "../../domain/errors/DomainErrors";
 import { API_BASE_URL } from "./endpoints";
+import { readCookie } from "./cookies";
+
+declare module "axios" {
+      export interface AxiosRequestConfig {
+            /** N'appelle pas le handler global de session expirée (ex. restauration de session). */
+            skipUnauthorizedHandler?: boolean;
+      }
+}
 
 interface ApiErrorBody {
       message?: string;
+      /** Certains handlers (JWT) répondent encore avec la clé `msg`. */
+      msg?: string;
       errors?: Record<string, string[] | string>;
 }
 
@@ -20,6 +34,9 @@ export class ApiError extends DomainError {
             this.details = details;
       }
 }
+
+const CSRF_COOKIE_NAME = "csrf_access_token";
+const MUTATING_METHODS = new Set(["post", "put", "patch", "delete"]);
 
 const DEFAULT_MESSAGES: Record<number, string> = {
       400: "Les données envoyées sont invalides.",
@@ -42,7 +59,12 @@ const firstValidationMessage = (errors: ApiErrorBody["errors"]): string | null =
 };
 
 const toDomainError = (body: ApiErrorBody | undefined, status: number): DomainError => {
-      const message = body?.message || firstValidationMessage(body?.errors) || DEFAULT_MESSAGES[status] || "Une erreur est survenue.";
+      const message =
+            body?.message ||
+            body?.msg ||
+            firstValidationMessage(body?.errors) ||
+            DEFAULT_MESSAGES[status] ||
+            "Une erreur est survenue.";
 
       if (status === 401) return new UnauthorizedError(message);
       if (status === 400 || status === 422) return new ValidationError(message, body?.errors);
@@ -60,14 +82,21 @@ export const createApiClient = (): AxiosInstance => {
       const client = axios.create({
             baseURL: API_BASE_URL,
             timeout: 15000,
+            // La session vit dans un cookie httpOnly : il doit accompagner chaque requête.
+            withCredentials: true,
             headers: { "Content-Type": "application/json" },
       });
 
       client.interceptors.request.use((config) => {
-            const token = tokenStorage.getToken();
-            if (token) {
-                  config.headers.Authorization = `Bearer ${token}`;
+            const method = (config.method ?? "get").toLowerCase();
+
+            if (MUTATING_METHODS.has(method)) {
+                  const csrfToken = readCookie(CSRF_COOKIE_NAME);
+                  if (csrfToken) {
+                        config.headers["X-CSRF-TOKEN"] = csrfToken;
+                  }
             }
+
             return config;
       });
 
@@ -79,14 +108,12 @@ export const createApiClient = (): AxiosInstance => {
                   }
 
                   const { status, data } = error.response;
-                  const domainError = toDomainError(data, status);
 
-                  if (status === 401) {
-                        tokenStorage.clearSession();
+                  if (status === 401 && !error.config?.skipUnauthorizedHandler) {
                         unauthorizedHandler?.();
                   }
 
-                  return Promise.reject(domainError);
+                  return Promise.reject(toDomainError(data, status));
             }
       );
 

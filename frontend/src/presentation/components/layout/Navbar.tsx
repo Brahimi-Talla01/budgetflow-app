@@ -1,15 +1,17 @@
 import { Bell, EllipsisVertical } from 'lucide-react'
-import image from '../../../assets/enfant.jpeg'; 
+import { assets } from '../../../assets/asset';
 import { useState } from 'react';
 import NotificationComponent from './NotificationComponent';
 import UserProfile from './UserProfile';
 import { useAuth } from '../../../application/context/authContext';
+import { useNotifications } from '../../../application/context/notificationContext';
 import { getDisplayName } from '../../../domain/entities/User';
 
 const Navbar = () => {
 
       const [isNotificationOpen, setIsNotificationOpen] = useState<boolean>(false);
       const { user } = useAuth();
+      const { unreadCount } = useNotifications();
       
       
       return (
@@ -18,7 +20,7 @@ const Navbar = () => {
                   <UserProfile
                         name={getDisplayName(user)}
                         level="Niveau Standard"
-                        image={image}
+                        image={assets.user}
                   />
 
 
@@ -26,10 +28,17 @@ const Navbar = () => {
                         
                         <button 
                               onClick={() => setIsNotificationOpen(!isNotificationOpen)} 
+                              aria-label={`Notifications, ${unreadCount} non lue${unreadCount > 1 ? "s" : ""}`}
                               className='cursor-pointer rounded-full p-2 hover:bg-gray-100 transition'
                         >
                               <div className='relative'>
-                                    <div className='absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white' />
+                                    {unreadCount > 0 && (
+                                          <div className='absolute -top-1 -right-1 min-w-4 h-4 px-1 bg-red-500 rounded-full border-2 border-white flex items-center justify-center'>
+                                                <span className='text-[10px] leading-none font-bold text-white'>
+                                                      {unreadCount > 9 ? "9+" : unreadCount}
+                                                </span>
+                                          </div>
+                                    )}
                                     <Bell className='w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700' />
                               </div>
                         </button>

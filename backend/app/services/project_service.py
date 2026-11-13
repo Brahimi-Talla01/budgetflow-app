@@ -1,5 +1,6 @@
 from app.repositories.project_repo import ProjectRepository
 
+
 class ProjectService:
 
     @staticmethod

@@ -1,8 +1,10 @@
-from app.models.project import ProjectModel
+from sqlalchemy import func
+
+from app.extensions import db
 from app.models.expense import ExpenseModel
 from app.models.income import IncomeModel
-from app.extensions import db
-from sqlalchemy import func
+from app.models.project import ProjectModel
+
 
 class ProjectRepository:
 

@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 class ExpenseSchema(Schema):
     expenseId = fields.Int(dump_only=True)
     amount = fields.Float(required=True)

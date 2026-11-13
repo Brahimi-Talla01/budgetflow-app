@@ -25,6 +25,8 @@ export const ENDPOINTS = {
       auth: {
             login: "/auth/login",
             register: "/auth/register",
+            me: "/auth/me",
+            logout: "/auth/logout",
       },
       expenses: {
             list: "/expenses/",
@@ -33,5 +35,13 @@ export const ENDPOINTS = {
       incomes: {
             list: "/incomes/",
             byId: (incomeId: number) => `/incomes/${incomeId}`,
+      },
+      projects: {
+            list: "/projects/",
+            byId: (projectId: number) => `/projects/${projectId}`,
+      },
+      notifications: {
+            list: "/notifications/",
+            byId: (notificationId: number) => `/notifications/${notificationId}`,
       },
 } as const;
