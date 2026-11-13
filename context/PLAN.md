@@ -131,7 +131,7 @@ graphique sans rechargement, et une erreur API s'affiche dans l'UI.
 
 ### Lot 2 — Pages réelles
 
-- [ ] `TransactionPage` : liste complète dépenses + revenus, filtres par période/catégorie
+- [x] `TransactionPage` : liste complète dépenses + revenus, filtres par type/période/catégorie + recherche
 - [ ] `ProjectsPage` : CRUD projets, rattachement d'une transaction à un projet
 - [ ] `AnalysePage` : agrégats par catégorie et évolution mensuelle
 - [ ] `ConseilPage` : contenu statique utile ou retrait de la route
