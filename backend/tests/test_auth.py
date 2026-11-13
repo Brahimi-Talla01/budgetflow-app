@@ -30,7 +30,7 @@ def test_register_rejects_invalid_payload(client, register_payload):
     assert "email" in response.get_json()["errors"]
 
 
-def test_login_returns_token_and_user(client, register_payload):
+def test_login_sets_http_only_cookie(client, register_payload):
     client.post("/api/v1/auth/register", json=register_payload)
 
     response = client.post(
@@ -40,8 +40,49 @@ def test_login_returns_token_and_user(client, register_payload):
 
     assert response.status_code == 200
     body = response.get_json()
-    assert body["access_token"]
     assert body["user"]["email"] == USER_EMAIL
+    # Le token ne doit jamais être renvoyé dans le corps JSON.
+    assert "access_token" not in body
+
+    access_cookie = client.get_cookie("access_token_cookie", path="/api/v1")
+    assert access_cookie is not None
+    assert access_cookie.http_only is True
+
+    csrf_cookie = client.get_cookie("csrf_access_token")
+    assert csrf_cookie is not None
+    assert not csrf_cookie.http_only
+
+
+def test_me_returns_authenticated_user(client, auth_headers):
+    response = client.get("/api/v1/auth/me")
+
+    assert response.status_code == 200
+    assert response.get_json()["user"]["email"] == USER_EMAIL
+
+
+def test_logout_clears_session(client, auth_headers):
+    response = client.post("/api/v1/auth/logout", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert client.get("/api/v1/auth/me").status_code == 401
+
+
+def test_write_requires_csrf_header(client, register_payload):
+    client.post("/api/v1/auth/register", json=register_payload)
+    client.post(
+        "/api/v1/auth/login",
+        json={"email": USER_EMAIL, "password": USER_PASSWORD},
+    )
+
+    response = client.post(
+        "/api/v1/expenses/",
+        json={"amount": 10, "category": "Transport", "date": "2026-01-01"},
+    )
+
+    assert response.status_code == 401
+    body = response.get_json()
+    assert body["success"] is False
+    assert "CSRF" in body["message"]
 
 
 def test_login_rejects_wrong_password(client, register_payload):

@@ -122,8 +122,11 @@ api/ (blueprints) -> services/ (métier) -> repositories/ (accès données) -> m
 - Les services n'utilisent jamais `db.session` directement : ils passent par les repositories.
 - Les notifications passent par `app/notifications/` (`NotificationManager`, `triggers`).
 - Toutes les routes sont exposées sous le préfixe `/api/v1` (voir `app/__init__.py`).
-- Les noms de fichiers historiques `*_shema.py` et `app/congig.py` sont conservés :
-  ne pas les renommer sans migration associée.
+- Configuration : `app/config.py` (variables d'environnement, secrets, CORS, cookies).
+- Authentification : cookie `httpOnly` (`access_token_cookie`) posé par `/auth/login`,
+  plus un cookie CSRF (`csrf_access_token`) à renvoyer dans l'en-tête `X-CSRF-TOKEN`
+  pour `POST`/`PUT`/`PATCH`/`DELETE`. Jamais de token dans le corps JSON.
+- Toutes les erreurs (y compris JWT et CSRF) renvoient `{ "success": false, "message": "..." }`.
 - Les erreurs renvoient un JSON `{ "success": false, "message": "..." }` avec un code HTTP explicite.
 
 **Commandes** (depuis `backend/`, environnement virtuel activé) :
@@ -135,9 +138,10 @@ python seed_roles.py                # créer les rôles admin/user
 python manage.py                    # serveur de dev sur http://127.0.0.1:5000
 ```
 
-**Variables d'environnement** : `DATABASE_URL`, `JWT_SECRET_KEY`
-(voir `backend/.env.example`). `JWT_SECRET_KEY` a une valeur par défaut de dev :
-elle doit être remplacée hors développement.
+**Variables d'environnement** : `DATABASE_URL`, `JWT_SECRET_KEY`, `CORS_ORIGINS`,
+`JWT_COOKIE_SECURE`, `JWT_COOKIE_SAMESITE`, `APP_ENV` (voir `backend/.env.example`).
+`JWT_SECRET_KEY` a une valeur par défaut en développement seulement :
+avec `APP_ENV=production` l'application refuse de démarrer sans secret.
 
 **Migrations** : toute modification de `app/models/` doit être accompagnée d'une migration
 (`flask --app manage.py db migrate -m "..."`), versionnée dans `migrations/versions/`.

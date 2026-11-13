@@ -115,11 +115,7 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | Sujet | Détail |
 | --- | --- |
 | Couverture partielle | tests des routes et utilitaires, pas encore de tests des services de notification ni du client HTTP (MSW) |
-| CORS ouvert | `cors.init_app(app)` sans restriction d'origine |
-| Clé JWT par défaut | `default-dev-key` si `JWT_SECRET_KEY` absent |
-| Gestion d'erreurs | pas de handler global, réponses hétérogènes (`errors` / `message`) |
-| Typos historiques | `app/congig.py`, `*_shema.py`, `migrations/alembic.ini` |
-| Dépendances | `flask_sqlalchemy`, `dotenv`, `psycopg2-binary` non épinglés |
+| Typos historiques | `migrations/alembic.ini` (chemin interne à Alembic) |
 | Rôles | `seed_roles.py` à lancer manuellement |
 
 ---
@@ -162,12 +158,12 @@ backend ou du client API régresse.
 
 ### Lot 4 — Sécurité et configuration
 
-- [ ] CORS restreint aux origines de développement / production via variable d'environnement
-- [ ] `JWT_SECRET_KEY` obligatoire hors développement (échec au démarrage si absent)
-- [ ] Migration du token vers cookie `httpOnly` + `Secure`, avec protection CSRF
-- [ ] Handler d'erreurs Flask global et format de réponse unique
-- [ ] Renommer `app/congig.py` → `app/config.py` et `*_shema.py` → `*_schema.py` (avec mise à jour des imports)
-- [ ] Épingler toutes les dépendances Python
+- [x] CORS restreint aux origines de développement / production via `CORS_ORIGINS`
+- [x] `JWT_SECRET_KEY` obligatoire hors développement (échec au démarrage si absent)
+- [x] Migration du token vers cookie `httpOnly` + protection CSRF (`X-CSRF-TOKEN`), routes `/auth/me` et `/auth/logout`
+- [x] Handler d'erreurs Flask global et format de réponse unique (y compris erreurs JWT et CSRF)
+- [x] Renommer `app/congig.py` → `app/config.py` et `*_shema.py` → `*_schema.py`
+- [x] Épingler toutes les dépendances Python
 
 Critère d'acceptation : démarrage impossible sans secret en production, aucune origine
 `*` dans la configuration CORS de production.

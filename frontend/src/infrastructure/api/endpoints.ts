@@ -25,6 +25,8 @@ export const ENDPOINTS = {
       auth: {
             login: "/auth/login",
             register: "/auth/register",
+            me: "/auth/me",
+            logout: "/auth/logout",
       },
       expenses: {
             list: "/expenses/",

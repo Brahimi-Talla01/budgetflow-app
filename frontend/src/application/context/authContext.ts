@@ -3,10 +3,11 @@ import type { User } from "../../domain/entities/User";
 
 export interface AuthContextType {
       user: User | null;
-      token: string | null;
-      login: (user: User, token: string) => void;
-      logout: () => void;
       isAuthenticated: boolean;
+      /** Vrai tant que la session en cours n'a pas été restaurée. */
+      isInitializing: boolean;
+      login: (user: User) => void;
+      logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

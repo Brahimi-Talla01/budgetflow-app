@@ -10,13 +10,13 @@ import { useAuth } from "./authContext";
 import { ProjectContext } from "./projectContext";
 
 export const ProjectProvider = ({ children }: { children: ReactNode }) => {
-      const { token } = useAuth();
+      const { isAuthenticated } = useAuth();
       const [projects, setProjects] = useState<ProjectProps[]>([]);
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState<string | null>(null);
 
       const refresh = useCallback(async () => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -28,10 +28,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const createProject = useCallback(async (payload: CreateProjectPayload) => {
-            if (!token) return false;
+            if (!isAuthenticated) return false;
 
             try {
                   const created = await repositories.projects.create(payload);
@@ -42,10 +42,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                   setError(getErrorMessage(err, "Impossible de créer ce projet."));
                   return false;
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const updateProject = useCallback(async (id: number, payload: UpdateProjectPayload) => {
-            if (!token) return false;
+            if (!isAuthenticated) return false;
 
             try {
                   const updated = await repositories.projects.update(id, payload);
@@ -56,10 +56,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                   setError(getErrorMessage(err, "Impossible de modifier ce projet."));
                   return false;
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const deleteProject = useCallback(async (id: number) => {
-            if (!token) return false;
+            if (!isAuthenticated) return false;
 
             try {
                   await repositories.projects.remove(id);
@@ -70,7 +70,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                   setError(getErrorMessage(err, "Impossible de supprimer ce projet."));
                   return false;
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       useEffect(() => {
             void refresh();
@@ -78,7 +78,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
       const value = useMemo(
             () => ({
-                  projects: token ? projects : [],
+                  projects: isAuthenticated ? projects : [],
                   loading,
                   error,
                   refresh,
@@ -86,7 +86,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                   updateProject,
                   deleteProject,
             }),
-            [token, projects, loading, error, refresh, createProject, updateProject, deleteProject]
+            [isAuthenticated, projects, loading, error, refresh, createProject, updateProject, deleteProject]
       );
 
       return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

@@ -6,13 +6,13 @@ import { useAuth } from "./authContext";
 import { ExpenseContext } from "./expenseContext";
 
 export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
-      const { token } = useAuth();
+      const { isAuthenticated } = useAuth();
       const [expenses, setExpenses] = useState<ExpenseProps[]>([]);
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState<string | null>(null);
 
       const fetchExpenses = useCallback(async () => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -24,10 +24,10 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const createExpense = useCallback(async (dto: CreateExpenseDTO): Promise<boolean> => {
-            if (!token) return false;
+            if (!isAuthenticated) return false;
 
             setLoading(true);
             try {
@@ -41,10 +41,10 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const updateExpense = useCallback(async (id: number, data: Partial<ExpenseProps>) => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -62,10 +62,10 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       const deleteExpense = useCallback(async (id: number) => {
-            if (!token) return;
+            if (!isAuthenticated) return;
 
             setLoading(true);
             try {
@@ -77,7 +77,7 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
             } finally {
                   setLoading(false);
             }
-      }, [token]);
+      }, [isAuthenticated]);
 
       useEffect(() => {
             void fetchExpenses();
@@ -86,7 +86,7 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
       const value = useMemo(
             () => ({
                   // Aucune donnée ne doit rester visible après une déconnexion.
-                  expenses: token ? expenses : [],
+                  expenses: isAuthenticated ? expenses : [],
                   loading,
                   error,
                   fetchExpenses,
@@ -94,7 +94,7 @@ export const ExpenseProvider = ({ children }: { children: ReactNode }) => {
                   updateExpense,
                   deleteExpense,
             }),
-            [token, expenses, loading, error, fetchExpenses, createExpense, updateExpense, deleteExpense]
+            [isAuthenticated, expenses, loading, error, fetchExpenses, createExpense, updateExpense, deleteExpense]
       );
 
       return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>;

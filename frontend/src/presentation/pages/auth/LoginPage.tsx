@@ -24,7 +24,7 @@ const LoginPage = () => {
     });
 
     if (res.success) {
-      login(res.user, res.token);
+      login(res.user);
       navigate("/dashboard");
     } else {
       setError(res.message);

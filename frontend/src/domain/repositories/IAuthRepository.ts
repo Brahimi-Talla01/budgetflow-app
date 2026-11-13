@@ -13,12 +13,11 @@ export interface RegisterPayload {
       roleId: number;
 }
 
-export interface AuthSession {
-      user: User;
-      token: string;
-}
-
 export interface IAuthRepository {
-      login(credentials: LoginCredentials): Promise<AuthSession>;
+      /** Ouvre la session (cookie httpOnly) et renvoie l'utilisateur connecté. */
+      login(credentials: LoginCredentials): Promise<User>;
       register(payload: RegisterPayload): Promise<User>;
+      /** Restaure la session courante à partir du cookie. */
+      me(): Promise<User>;
+      logout(): Promise<void>;
 }
