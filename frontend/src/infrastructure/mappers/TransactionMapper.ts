@@ -5,6 +5,7 @@ export class TransactionMapper {
       static toRow(dto: TransactionDTO): TransactionRow {
             return {
                   key: `${dto.type}-${dto.id}`,
+                  id: dto.id,
                   type: dto.type,
                   label: dto.label,
                   category: dto.category,

@@ -89,12 +89,14 @@ describe("NotificationMapper", () => {
                   notificationId: 9,
                   title: "Nouvelle dépense",
                   message: "Vous avez ajouté une dépense.",
+                  link: "/dashboard/transaction/expense/12",
                   isRead: false,
                   createdAt: "2026-01-02T09:30:00",
                   userId: 3,
             });
 
             expect(notification.id).toBe(9);
+            expect(notification.link).toBe("/dashboard/transaction/expense/12");
             expect(notification.isRead).toBe(false);
             expect(notification.createdAt).toBeInstanceOf(Date);
       });

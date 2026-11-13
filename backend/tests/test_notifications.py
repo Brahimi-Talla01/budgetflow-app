@@ -15,6 +15,19 @@ def test_creating_expense_creates_notification(client, auth_headers):
     assert len(notifications) == 1
     assert notifications[0]["title"] == "Nouvelle dépense"
     assert notifications[0]["isRead"] is False
+    assert notifications[0]["link"].startswith("/dashboard/transaction/expense/")
+
+
+def test_income_notification_links_to_the_transaction(client, auth_headers):
+    client.post(
+        "/api/v1/incomes/",
+        json={"amount": 900, "source": "Salaire", "date": "2026-02-01"},
+        headers=auth_headers,
+    )
+
+    notifications = client.get("/api/v1/notifications/", headers=auth_headers).get_json()
+
+    assert notifications[0]["link"].startswith("/dashboard/transaction/income/")
 
 
 def test_mark_notification_as_read(client, auth_headers):

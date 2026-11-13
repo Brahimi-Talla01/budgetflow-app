@@ -14,7 +14,9 @@ import { NotificationProvider } from "./application/context/NotificationProvider
 const Home = lazy(() => import("./presentation/pages/home/Home"))
 const DashboardPage = lazy(() => import("./presentation/pages/dashboard/DashboardPage"))
 const TransactionPage = lazy(() => import("./presentation/pages/transaction/TransactionPage"))
+const TransactionDetailPage = lazy(() => import("./presentation/pages/transaction/TransactionDetailPage"))
 const ProjectsPage = lazy(() => import("./presentation/pages/projects/ProjectsPage"))
+const ProjectDetailPage = lazy(() => import("./presentation/pages/projects/ProjectDetailPage"))
 const AnalysePage = lazy(() => import("./presentation/pages/analyse/AnalysePage"))
 const ConseilPage = lazy(() => import("./presentation/pages/conseil/ConseilPage"))
 const LoginPage = lazy(() => import("./presentation/pages/auth/LoginPage"))
@@ -44,7 +46,9 @@ const App = () => {
                       <Route path="/dashboard" element={<Layout />}>
                         <Route index element={<DashboardPage />} />
                         <Route path="transaction" element={<TransactionPage />} />
+                        <Route path="transaction/:type/:id" element={<TransactionDetailPage />} />
                         <Route path="projet" element={<ProjectsPage />} />
+                        <Route path="projet/:projectId" element={<ProjectDetailPage />} />
                         <Route path="analyse" element={<AnalysePage />} />
                         <Route path="conseil" element={<ConseilPage />} />
                       </Route>

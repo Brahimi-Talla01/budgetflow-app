@@ -1,7 +1,8 @@
-import { EllipsisVertical } from "lucide-react";
 import React from "react";
+import { Link } from "react-router-dom";
 
 export interface ParsedExpense {
+      id: number;
       title: string;
       price: number;
       date: string;
@@ -22,7 +23,11 @@ const RecentTransactionCard: React.FC<RecentTransactionCardProps> = ({
       const Icon = expense.icon;
 
       return (
-            <div className="shrink-0 w-[280px] rounded-md p-4 border border-gray-100 hover:shadow-lg hover:scale-[1.02] transition-all">
+            <Link
+                  to={`/dashboard/transaction/expense/${expense.id}`}
+                  aria-label={`Voir le détail de ${expense.title}`}
+                  className="shrink-0 w-[280px] rounded-md p-4 border border-gray-100 hover:shadow-lg hover:scale-[1.02] transition-all"
+            >
                   
                   <div className="flex items-start justify-between w-full">
                         <div className="flex items-center gap-3 mb-3">
@@ -35,10 +40,6 @@ const RecentTransactionCard: React.FC<RecentTransactionCardProps> = ({
                                     <p className="text-xs text-gray-500">{expense.date}</p>
                               </div>
                         </div>
-
-                        <button className=' cursor-pointer rounded-full p-2 hover:bg-gray-100 transition'>
-                              <EllipsisVertical className=' w-5 h-5' />
-                        </button>
 
                   </div>
 
@@ -53,7 +54,7 @@ const RecentTransactionCard: React.FC<RecentTransactionCardProps> = ({
                   >
                         {expense.category}
                   </span>
-            </div>
+            </Link>
       );
 };
 

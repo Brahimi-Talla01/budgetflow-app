@@ -27,6 +27,26 @@ def test_list_expenses_returns_created_items(client, auth_headers):
     assert body[0]["description"] == "Courses de la semaine"
 
 
+def test_get_expense_by_id(client, auth_headers):
+    created = client.post(
+        "/api/v1/expenses/", json=EXPENSE_PAYLOAD, headers=auth_headers
+    ).get_json()["expense"]
+
+    response = client.get(
+        f"/api/v1/expenses/{created['expenseId']}", headers=auth_headers
+    )
+
+    assert response.status_code == 200
+    assert response.get_json()["description"] == "Courses de la semaine"
+    assert response.get_json()["expenseId"] == created["expenseId"]
+
+
+def test_get_unknown_expense_returns_404(client, auth_headers):
+    response = client.get("/api/v1/expenses/9999", headers=auth_headers)
+
+    assert response.status_code == 404
+
+
 def test_update_expense(client, auth_headers):
     created = client.post(
         "/api/v1/expenses/", json=EXPENSE_PAYLOAD, headers=auth_headers

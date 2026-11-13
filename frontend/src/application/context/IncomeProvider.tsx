@@ -29,6 +29,7 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
             mutationFn: (payload: CreateIncomeDTO) => repositories.incomes.create(payload),
             onSuccess: () => {
                   void queryClient.invalidateQueries({ queryKey: queryKeys.incomes });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.transactionsRoot });
                   void queryClient.invalidateQueries({ queryKey: queryKeys.notifications });
             },
       });
@@ -38,6 +39,7 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
                   repositories.incomes.update(id, payload),
             onSuccess: () => {
                   void queryClient.invalidateQueries({ queryKey: queryKeys.incomes });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.transactionsRoot });
             },
       });
 
@@ -45,6 +47,7 @@ export const IncomeProvider = ({ children }: { children: ReactNode }) => {
             mutationFn: (id: number) => repositories.incomes.remove(id),
             onSuccess: () => {
                   void queryClient.invalidateQueries({ queryKey: queryKeys.incomes });
+                  void queryClient.invalidateQueries({ queryKey: queryKeys.transactionsRoot });
             },
       });
 

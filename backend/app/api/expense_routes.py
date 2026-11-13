@@ -34,6 +34,19 @@ def list_expenses():
     return jsonify(expenses), 200
 
 
+# GET ONE
+@expense_bp.get("/<int:expense_id>")
+@jwt_required()
+def get_expense(expense_id):
+    user_id = int(get_jwt_identity())
+    expense = ExpenseService.get_expense(expense_id, user_id)
+
+    if not expense:
+        return jsonify({"message": "Dépense introuvable"}), 404
+
+    return jsonify(expense), 200
+
+
 # UPDATE
 @expense_bp.put("/<int:expense_id>")
 @jwt_required()
