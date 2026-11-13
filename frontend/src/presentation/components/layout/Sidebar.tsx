@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useAuth } from '../../../application/context/AuthContext';
+import { useAuth } from '../../../application/context/authContext';
 
 const navItems = [
       { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },

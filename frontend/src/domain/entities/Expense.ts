@@ -44,6 +44,18 @@ export interface CreateExpenseDTO {
     projectId?: number;
 }
 
+// Type d'une transaction saisie depuis le modal (dépense ou revenu)
+export type TransactionType = "expense" | "income";
+
+export interface TransactionPayload {
+    amount: number;
+    category: string;
+    description?: string;
+    date: string;
+    projectId?: number;
+    type: TransactionType;
+}
+
 
 // Classe Entité 
 export class Expense {

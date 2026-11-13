@@ -1,18 +1,12 @@
 import { Plus } from "lucide-react";
 import { Button } from "../ui/Button";
-import { Activity } from "react";
-import TransactionModal from "../transaction/TransactionModal";
 
 interface HeaderProps {
       isModalOpen: boolean;
       setIsModalOpen: (open: boolean) => void;
 }
 
-const EmptyStateMostExpense: React.FC<HeaderProps> = ({ isModalOpen, setIsModalOpen }) => {
-
-      const handleSubmit = () => {
-            console.log("Submit data");
-      }
+const EmptyStateMostExpense: React.FC<HeaderProps> = ({ setIsModalOpen }) => {
 
       return (
             <div className="flex flex-col items-center justify-center py-8 opacity-70">
@@ -39,15 +33,6 @@ const EmptyStateMostExpense: React.FC<HeaderProps> = ({ isModalOpen, setIsModalO
                   >
                         Ajouter une dépense
                   </Button>
-
-                  {/* Modal */}
-                  <Activity mode={isModalOpen ? 'visible' : 'hidden' }>
-                        <TransactionModal 
-                              isOpen={isModalOpen} 
-                              onClose={() => setIsModalOpen(false)}
-                              onSubmit={handleSubmit} 
-                        />
-                  </Activity>
             </div>
       );
 };

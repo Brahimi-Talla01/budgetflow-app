@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import EditProfileCard from "./EditProfileCard";
-import { useAuth } from "../../../application/context/AuthContext";
+import { useAuth } from "../../../application/context/authContext";
 
 interface UserProfileProps {
   name: string;

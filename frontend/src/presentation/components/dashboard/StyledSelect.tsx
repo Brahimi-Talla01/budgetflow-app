@@ -27,7 +27,7 @@ const StyledSelect = ({ onChange }: StyledSelectProps) => {
             setSelectedOption(option);
             onChange(option.value);
             setIsOpen(false); 
-      }, []);
+      }, [onChange]);
 
       useEffect(() => {
             const handleClickOutside = (event: MouseEvent) => {

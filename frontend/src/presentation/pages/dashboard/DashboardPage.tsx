@@ -4,32 +4,26 @@ import RecentTransaction from "../../components/dashboard/RecentTransaction"
 import TransactionsBar from "../../components/dashboard/TransactionsBar"
 import MostExpense from "../../components/dashboard/MostExpense"
 import EmptyStateMostExpense from "../../components/dashboard/EmptyStateMostExpense"
-import { useExpenses } from "../../../application/context/ExpenseContext"
+import { useExpenses } from "../../../application/context/expenseContext"
 import { useState } from "react"
-import type { ExpenseFormProps } from "../../../domain/entities/Expense"
+import type { TransactionPayload } from "../../../domain/entities/Expense"
 import PageTitle from "../../components/ui/PageTitle"
 
-
-export type TransactionType = "expense" | "income";
 
 const DashboardPage = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const { expenses, loading, createExpense } = useExpenses();
 
-    const handleSubmit = async (data: ExpenseFormProps, type: TransactionType) => {
-        if (type !== "expense") return;
-
-        const dateObj = new Date(data.date);
+    const handleSubmit = async (data: TransactionPayload) => {
+        if (data.type !== "expense") return;
 
         const ok = await createExpense({
-            amount: Number(data.amount),
+            amount: data.amount,
             category: data.category,
-            description: data.description || undefined,
-            date: dateObj.toISOString().split("T")[0],  
-            projectId: data.hasProject && data.projectId ? Number(data.projectId) : undefined
+            description: data.description,
+            date: data.date,
+            projectId: data.projectId,
         });
-
-        console.log(ok);
 
         if (!ok) {
             alert("Erreur lors de la création de la dépense");

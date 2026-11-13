@@ -1,40 +1,29 @@
-import { useState } from "react";
-import axios from "axios";
+import { useCallback, useState } from "react";
+import { repositories } from "../../application/di/container";
+import type { RegisterPayload } from "../../domain/repositories/IAuthRepository";
+import type { User } from "../../domain/entities/User";
+import { getErrorMessage } from "../../shared/utils/errors";
+
+export type RegisterResult = { success: true; user: User } | { success: false; message: string };
 
 export const useRegister = () => {
-  const [loading, setLoading] = useState(false);
+      const [loading, setLoading] = useState(false);
 
-  const execute = async (data: any) => {
-    setLoading(true);
+      const execute = useCallback(async (payload: RegisterPayload): Promise<RegisterResult> => {
+            setLoading(true);
 
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
-        data
-      );
+            try {
+                  const user = await repositories.auth.register(payload);
+                  return { success: true, user };
+            } catch (error) {
+                  return {
+                        success: false,
+                        message: getErrorMessage(error, "Erreur lors de l'inscription."),
+                  };
+            } finally {
+                  setLoading(false);
+            }
+      }, []);
 
-      setLoading(false);
-      console.log("RESPONSE FROM HOOK:", res);
-
-
-      // SUCCESS (201)
-      return {
-        success: true,
-        message: res.data.message,
-        user: res.data.user
-      };
-    } catch (error: any) {
-      setLoading(false);
-
-      return {
-        success: false,
-        message:
-          error?.response?.data?.message ||
-          error?.response?.data?.errors ||
-          "Erreur lors de l'inscription"
-      };
-    }
-  };
-
-  return { execute, loading };
+      return { execute, loading };
 };

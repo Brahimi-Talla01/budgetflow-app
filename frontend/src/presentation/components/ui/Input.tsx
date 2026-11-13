@@ -25,7 +25,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         },
         ref 
     ) => {
-        const inputId = id || React.useId(); 
+        // useId doit être appelé de façon inconditionnelle (règle des Hooks)
+        const generatedId = React.useId();
+        const inputId = id ?? generatedId;
 
 
         const baseInputClasses = "flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50";

@@ -9,7 +9,7 @@ import {
   ListOrdered,
   ServerIcon
 } from 'lucide-react';
-import { useExpenses } from '../../../application/context/ExpenseContext';
+import { useExpenses } from '../../../application/context/expenseContext';
 import RecentTransactionCard from './RecentTransactionCard';
 
 
