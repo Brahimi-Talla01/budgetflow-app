@@ -1,5 +1,5 @@
 import { Bell, EllipsisVertical } from 'lucide-react'
-import image from '../../../assets/enfant.jpeg'; 
+import { assets } from '../../../assets/asset';
 import { useState } from 'react';
 import NotificationComponent from './NotificationComponent';
 import UserProfile from './UserProfile';
@@ -20,7 +20,7 @@ const Navbar = () => {
                   <UserProfile
                         name={getDisplayName(user)}
                         level="Niveau Standard"
-                        image={image}
+                        image={assets.user}
                   />
 
 

@@ -4,6 +4,7 @@ import PageTitle from "../../components/ui/PageTitle";
 import AlertBanner, { type FeedbackKind } from "../../components/ui/AlertBanner";
 import { Button } from "../../components/ui/Button";
 import ProjectCard from "../../components/projects/ProjectCard";
+import { Skeleton } from "../../components/ui/Skeleton";
 import ProjectForm from "../../components/projects/ProjectForm";
 import { useProjects } from "../../../application/context/projectContext";
 import { useExpenses } from "../../../application/context/expenseContext";
@@ -133,8 +134,10 @@ const ProjectsPage = () => {
                   )}
 
                   {loading && projects.length === 0 ? (
-                        <div className="flex justify-center items-center py-16">
-                              <span className="w-9 h-9 rounded-full border-2 border-t-transparent border-primary animate-spin" />
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" role="status" aria-label="Chargement des projets">
+                              <Skeleton className="h-40" />
+                              <Skeleton className="h-40" />
+                              <Skeleton className="h-40" />
                         </div>
                   ) : projects.length === 0 ? (
                         <div className="bg-white rounded-xl mt-4 flex flex-col items-center justify-center py-14 text-center">

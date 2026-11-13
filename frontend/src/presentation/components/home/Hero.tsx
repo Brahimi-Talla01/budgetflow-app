@@ -1,6 +1,5 @@
 import { Button } from "../ui/Button"; 
-import groupeProfile from '../../../assets/group_profile.png'; 
-import expense from '../../../assets/expense.png'; 
+import { assets } from '../../../assets/asset';
 import { ArrowRight, TrendingUp, ShieldCheck } from 'lucide-react'; 
 import { useNavigate, type NavigateFunction } from "react-router-dom";
 import { useAuth } from "../../../application/context/authContext";
@@ -62,7 +61,7 @@ const Hero = () => {
                                     {/* Social Proof */}
                                     <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
                                           <div className="flex -space-x-3">
-                                                <img className="h-12 w-auto object-contain drop-shadow-sm" src={groupeProfile} alt="Utilisateurs satisfaits" />
+                                                <img className="h-12 w-auto object-contain drop-shadow-sm" src={assets.groupProfile} alt="Utilisateurs satisfaits" />
                                           </div>
                                           <div className="text-left">
                                                 <div className="flex items-center gap-1">
@@ -95,7 +94,7 @@ const Hero = () => {
                                                 {/* Fake Chart */}
                                                 <div className="flex items-center justify-center">
                                                       <div className="h-40 w-40 mb-8">
-                                                            <img src={expense} alt="Chart" className="w-full h-full" />
+                                                            <img src={assets.expense} alt="Chart" className="w-full h-full" />
                                                       </div>
                                                 </div>
 
