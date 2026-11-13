@@ -2,7 +2,9 @@ import { useCallback, useMemo, useState } from "react";
 import { useFormValidation } from "../../../application/hooks/useFormValidation";
 import { AlertCircle, Briefcase, Calendar, DollarSign, FileText, Tag, TrendingDown, TrendingUp, X } from "lucide-react";
 import { useExpenses } from "../../../application/context/expenseContext";
+import { useProjects } from "../../../application/context/projectContext";
 import type { TransactionPayload, TransactionType } from "../../../domain/entities/Expense";
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from "../../../shared/constants/transactions";
 import { Button } from "../ui/Button";
 
 interface TransactionModalProps {
@@ -15,7 +17,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
     
     const [transactionType, setTransactionType] = useState<TransactionType>('expense');
     const {  loading } = useExpenses();
-    
+    const { projects, loading: projectsLoading } = useProjects();
 
     const { 
         formData, 
@@ -24,15 +26,6 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
         validateForm, 
         resetForm,
     } = useFormValidation(); 
-
-    // Données fixes (Catégories et Projets)
-    const expenseCategories = ['Alimentation', 'Transport', 'Logement', 'Loisirs', 'Santé', 'Autres'];
-    const incomeCategories = ['Salaire', 'Freelance', 'Investissement', 'Remboursement', 'Autres'];
-    const projects = [
-        { id: '1', name: 'Site E-commerce' },
-        { id: '2', name: 'Application Mobile' },
-        { id: '3', name: 'Refonte Website' }
-    ];
 
     const handleClose = useCallback(() => {
         resetForm();
@@ -204,7 +197,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                                     `}
                                 >
                                     <option value="">Sélectionner une {transactionType === "expense" ? 'catégorie' : 'source'}</option>
-                                    {(transactionType === 'expense' ? expenseCategories : incomeCategories).map(cat => (
+                                    {(transactionType === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES).map(cat => (
                                         <option key={cat} value={cat}>{cat}</option>
                                     ))}
                                 </select>
@@ -300,8 +293,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                                 <div className="relative">
                                     <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                     <select
-                                        value={formData.projectId || ''}
-                                        onChange={(e) => handleChange('projectId', e.target.value)}
+                                        value={formData.projectId ?? ''}
+                                        disabled={projectsLoading}
+                                        onChange={(e) => handleChange('projectId', Number(e.target.value))}
                                         className={`
                                             w-full pl-10 pr-4 py-3 border-2 rounded-xl appearance-none
                                             focus:outline-none focus:ring-2 transition-all
@@ -312,7 +306,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ isOpen, onClose, on
                                             bg-white text-gray-900
                                         `}
                                     >
-                                        <option value="">Sélectionner un projet</option>
+                                        <option value="">
+                                            {projects.length === 0 ? "Aucun projet disponible" : "Sélectionner un projet"}
+                                        </option>
                                         {projects.map(project => (
                                             <option key={project.id} value={project.id}>{project.name}</option>
                                         ))}

@@ -91,6 +91,8 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 | Revenus non créables | `handleSubmit` sort si `type !== "expense"` : le modal de transaction ne crée jamais de revenu alors que `createIncome` existe | `pages/dashboard/DashboardPage.tsx` |
 | Projets factices | liste codée en dur dans le modal, aucune utilisation de l'API projets | `components/transaction/TransactionModal.tsx` |
 | Catégories codées en dur | listes dans le composant | idem |
+
+> Les trois lignes ci-dessus sont traitées par le lot 1 (voir § 4).
 | Pages vides | `Analyse`, `Conseil`, `Projets`, `Transaction` = 13 à 16 lignes de placeholder | `pages/*` |
 | Composants vides | `ExpenseCard`, `ExpenseForm`, `ExpenseList`, `ProtectedRoute` (doublon de `routes/PrivateRoute.tsx`) | `components/expenses/*` |
 | Couches inutilisées | interfaces notification/projet, use-cases, `DIContext.tsx` vides | `domain/`, `application/` |
@@ -118,11 +120,11 @@ par le `<title>` natif de React 19, ajout de `Flask-Cors` et `marshmallow` aux d
 
 Objectif : créer, modifier et supprimer dépenses **et** revenus depuis l'interface.
 
-- [ ] `DashboardPage.handleSubmit` : router vers `createExpense` ou `createIncome` selon `type`
-- [ ] Afficher un retour utilisateur (succès / erreur) au lieu de `alert`
-- [ ] Charger les projets depuis `GET /projects` (créer `HttpProjectRepository` + DTO/mapper)
-- [ ] Remplacer les catégories codées en dur par une constante partagée (`shared/constants`)
-- [ ] Afficher les revenus dans `TransactionsBar` et le solde net sur le dashboard
+- [x] `DashboardPage.handleSubmit` : router vers `createExpense` ou `createIncome` selon `type`
+- [x] Afficher un retour utilisateur (succès / erreur) au lieu de `alert`
+- [x] Charger les projets depuis `GET /projects` (créer `HttpProjectRepository` + DTO/mapper)
+- [x] Remplacer les catégories codées en dur par une constante partagée (`shared/constants`)
+- [x] Afficher les revenus dans `TransactionsBar` et le solde net sur le dashboard
 
 Critère d'acceptation : ajouter un revenu depuis le modal met à jour la liste et le
 graphique sans rechargement, et une erreur API s'affiche dans l'UI.
